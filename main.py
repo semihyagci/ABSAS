@@ -2,12 +2,11 @@ import tkinter as tk
 from tkinter import filedialog
 from sentence_splitter import SentenceSplitter
 
-def import_csv():
-    file_path = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
+def import_txt():
+    file_path = filedialog.askopenfilename(filetypes=[("Text files", "*.txt")])
     if file_path:
         file_path_entry.delete(0, tk.END)
         file_path_entry.insert(tk.END, file_path)
-
 
 def load_dataset():
     if file_path_entry.get():
@@ -33,9 +32,38 @@ def load_dataset():
 def dataset_loaded(loading_label,dataset):
     loading_label.config(text="Dataset loaded successfully!")
     print("Loaded dataset:", dataset)
+
+    spacer_label = tk.Label(root, text="")
+    spacer_label.pack(pady=20)
+
+    preference_label = tk.Label(root, text="Do you want to highlight your own aspects or use our recommendation system?")
+    preference_label.pack()
+
+    preference_var = tk.StringVar(value="No")  # Default choice is "No"
+    radio_frame = tk.Frame(root)
+    radio_frame.pack()
+
+    own_aspects_radio = tk.Radiobutton(radio_frame, text="Yes", variable=preference_var, value="Yes")
+    own_aspects_radio.pack(side=tk.LEFT, padx=10)
+
+    recommendation_system_radio = tk.Radiobutton(radio_frame, text="No", variable=preference_var, value="No")
+    recommendation_system_radio.pack(side=tk.LEFT, padx=10)
+
+    confirm_button = tk.Button(root, text="Confirm", command=lambda: confirm_choice(preference_var.get()))
+    confirm_button.pack()
+
     splitter = SentenceSplitter(language='en')
     sentences = splitter.split(text=dataset)
     print("Divided sentences: ", sentences)
+
+
+def confirm_choice(choice):
+    if choice == "Yes":
+        print("User chose to highlight their own aspects.")
+        # Handle highlighting aspects
+    else:
+        print("User chose to use the recommendation system.")
+        # Handle recommendation system
 
 
 def create_scrollable_text(parent):
@@ -73,7 +101,7 @@ file_label.grid(row=0, column=0)
 file_path_entry = tk.Entry(file_frame, width=40)
 file_path_entry.grid(row=0, column=1)
 
-browse_button = tk.Button(file_frame, text="Browse Files", command=import_csv)
+browse_button = tk.Button(file_frame, text="Browse Files", command=import_txt)
 browse_button.grid(row=0, column=2)
 
 load_button = tk.Button(root, text="Load Dataset", command=load_dataset)
