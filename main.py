@@ -2,12 +2,14 @@ import tkinter as tk
 from tkinter import filedialog
 from sentence_splitter import SentenceSplitter
 
+#TXT IMPORT METHODU
 def import_txt():
     file_path = filedialog.askopenfilename(filetypes=[("Text files", "*.txt")])
     if file_path:
         file_path_entry.delete(0, tk.END)
         file_path_entry.insert(tk.END, file_path)
 
+#NEYLE IMPORT ETMİŞ ONU KONTROL EDİP AKSİYON ALIYO
 def load_dataset():
     if file_path_entry.get():
         with open(file_path_entry.get(), 'r') as file:
@@ -29,6 +31,7 @@ def load_dataset():
     root.after(3000, lambda: dataset_loaded(loading_label,dataset))
 
 
+#DATASET YÜKLENDİKTEN SONRA SORU KISMI
 def dataset_loaded(loading_label,dataset):
     loading_label.config(text="Dataset loaded successfully!")
     print("Loaded dataset:", dataset)
@@ -36,6 +39,7 @@ def dataset_loaded(loading_label,dataset):
     spacer_label = tk.Label(root, text="")
     spacer_label.pack(pady=20)
 
+   #HIGHLIGHTING CHOICE RADIO BUTTON KISMI
     preference_label = tk.Label(root, text="Do you want to highlight your own aspects or use our recommendation system?")
     preference_label.pack()
 
