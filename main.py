@@ -2,6 +2,9 @@ import tkinter as tk
 from tkinter import filedialog
 from sentence_splitter import SentenceSplitter
 
+from AspectTaggingApp import AspectTaggingApp
+
+
 #TXT IMPORT METHODU
 def import_txt():
     file_path = filedialog.askopenfilename(filetypes=[("Text files", "*.txt")])
@@ -53,18 +56,21 @@ def dataset_loaded(loading_label,dataset):
     recommendation_system_radio = tk.Radiobutton(radio_frame, text="No", variable=preference_var, value="No")
     recommendation_system_radio.pack(side=tk.LEFT, padx=10)
 
-    confirm_button = tk.Button(root, text="Confirm", command=lambda: confirm_choice(preference_var.get()))
-    confirm_button.pack()
-
     splitter = SentenceSplitter(language='en')
     sentences = splitter.split(text=dataset)
+
+    confirm_button = tk.Button(root, text="Confirm", command=lambda: confirm_choice(preference_var.get(),sentences))
+    confirm_button.pack()
+
     print("Divided sentences: ", sentences)
 
 
-def confirm_choice(choice):
+def confirm_choice(choice,sentences):
     if choice == "Yes":
         print("User chose to highlight their own aspects.")
-        # Handle highlighting aspects
+        for widget in root.winfo_children():
+            widget.destroy()
+        app = AspectTaggingApp(root,sentences)
     else:
         print("User chose to use the recommendation system.")
         # Handle recommendation system
