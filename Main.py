@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
 from sentence_splitter import SentenceSplitter
-
 from AspectTaggingApp import AspectTaggingApp
 
 
