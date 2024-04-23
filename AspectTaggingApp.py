@@ -1,16 +1,14 @@
 import tkinter as tk
-from tkinter import simpledialog, ttk
+from tkinter import ttk
 
-
-class AspectTaggingApp:
-    def __init__(self, root, sentences):
-        self.root = root
+class AspectTaggingApp(tk.Frame):
+    def __init__(self, master, sentences, *args, **kwargs):
+        super().__init__(master, *args, **kwargs)
         self.sentences = sentences
-        self.root.title("Sentence and Word-Level Aspect Tagging")
         self.setup_widgets()
 
     def setup_widgets(self):
-        input_frame = tk.Frame(self.root)
+        input_frame = tk.Frame(self)
         input_frame.pack(fill=tk.X, padx=10, pady=5)
 
         self.text = tk.Text(input_frame, wrap=tk.WORD, height=15)
@@ -22,24 +20,18 @@ class AspectTaggingApp:
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.text.config(yscrollcommand=scrollbar.set)
 
-        for idx, sentence in enumerate(self.sentences, start=1):
-            sentence_id = f"ID{idx}: "
-            self.text.insert(tk.END, sentence_id + sentence + "\n\n")
+        self.text.insert(tk.END,self.sentences + "\n\n")
         self.text.config(state=tk.DISABLED)
 
     def tag_word(self, event):
-        # Get the index of the mouse click and adjust to word boundaries
         index = self.text.index(f"@{event.x},{event.y}")
         word_start = self.text.index(f"{index} wordstart")
         word_end = self.text.index(f"{index} wordend")
-
-        # Get the word and ask for aspect
         word = self.text.get(word_start, word_end)
-        # Create a dropdown menu for selecting aspect
-        aspect_window = tk.Toplevel(self.root)
+
+        aspect_window = tk.Toplevel(self)
         aspect_window.title("Aspect Tagging")
 
-        # Dropdown menu for aspect selection
         aspect_label = tk.Label(aspect_window, text=f"Select aspect for the word: '{word}'")
         aspect_label.pack(pady=10)
 
@@ -49,7 +41,6 @@ class AspectTaggingApp:
         aspect_menu = ttk.Combobox(aspect_window, textvariable=aspect_var, values=aspect_options, state="readonly")
         aspect_menu.pack(pady=5)
 
-        # Button to confirm aspect tagging
         confirm_button = tk.Button(aspect_window, text="Confirm",
                                    command=lambda: self.confirm_aspect(word_start, word_end, aspect_var.get(),
                                                                        aspect_window))
@@ -60,5 +51,3 @@ class AspectTaggingApp:
         self.text.tag_add(aspect, word_start, word_end)
         self.text.tag_configure(aspect, foreground=color)
         aspect_window.destroy()  # Close the aspect tagging window
-
-

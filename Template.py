@@ -1,5 +1,8 @@
 import tkinter as tk
 
+from AspectTaggingApp import AspectTaggingApp
+
+
 class Template(tk.Frame):
     def __init__(self, master, id_num, text_list, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
@@ -12,10 +15,9 @@ class Template(tk.Frame):
         id_label = tk.Label(self, text=f"ID: {self.id_num}")
         id_label.grid(row=0, column=0, padx=5, pady=5)
 
-        # Text Widget
-        text_widget = tk.Text(self, height=4, width=40)
-        text_widget.insert(tk.END, f"{self.text_list}\n")
-        text_widget.grid(row=0, column=1, padx=5, pady=5)
+        # Aspect Tagging Widget
+        aspect_tagging_app = AspectTaggingApp(self, self.text_list)
+        aspect_tagging_app.grid(row=0, column=1, padx=5, pady=5)
 
         # Overall Aspect Dropdown
         options = ["Positive", "Negative", "Neutral"]
@@ -30,7 +32,6 @@ if __name__ == "__main__":
     # Column Names
     column_names = ["ID", "Text", "Overall Aspect"]
 
-    # Sample data
     input_text = ["Text A", "Text B", "Text C"]
 
     # Display column names
