@@ -1,5 +1,4 @@
 import tkinter as tk
-from tkinter import RIGHT, Y
 
 from AspectTaggingApp import AspectTaggingApp
 

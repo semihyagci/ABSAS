@@ -23,6 +23,17 @@ class AspectTaggingApp(tk.Frame):
         self.text.insert(tk.END, self.sentences + "\n\n")
         self.text.config(state=tk.DISABLED)
 
+        # Bind MouseWheel event to the inner text widget
+        self.text.bind("<MouseWheel>", self.on_text_scroll)
+
+    def on_text_scroll(self, event):
+        # Determine the direction of scrolling
+        scroll_direction = -1 if event.delta > 0 else 1
+        # Scroll the text widget
+        self.text.yview_scroll(scroll_direction, "units")
+        # Stop the event propagation to prevent scrolling the outer window
+        return "break"
+
     def tag_word(self, event):
         index = self.text.index(f"@{event.x},{event.y}")
         word_start = self.text.index(f"{index} wordstart")

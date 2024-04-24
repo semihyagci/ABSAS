@@ -97,9 +97,19 @@ def confirm_choice(choice, sentences):
         for idx, input_text in enumerate(sentences):
             template = Template(frame, id_num=idx + 1, text_list=input_text)
             template.grid(row=idx + 1, column=0, columnspan=3, padx=5, pady=5, sticky="ew")
+
+        # Bind mouse wheel events to the canvas for scrolling
+        root.bind("<MouseWheel>", lambda event: scroll_canvas(event, canvas))
     else:
         print("User chose to use the recommendation system.")
         # Handle recommendation system
+
+def scroll_canvas(event, canvas):
+    # Determine the direction of scrolling
+    if event.delta > 0:
+        canvas.yview_scroll(-1, "units")
+    else:
+        canvas.yview_scroll(1, "units")
 
 
 def create_scrollable_text(parent):
