@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import RIGHT, Y
 
 from AspectTaggingApp import AspectTaggingApp
 
@@ -23,5 +24,7 @@ class Template(tk.Frame):
         options = ["Positive", "Negative", "Neutral"]
         self.aspect_var = tk.StringVar(self)
         self.aspect_var.set(options[2])  # Default value
-        dropdown = tk.OptionMenu(self, self.aspect_var,options)
+        dropdown = tk.OptionMenu(self, self.aspect_var, *options)
         dropdown.grid(row=0, column=2, padx=5, pady=5)
+
+
