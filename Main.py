@@ -1,22 +1,36 @@
+import csv
+import sys
 import tkinter as tk
 from tkinter import filedialog
 from sentence_splitter import SentenceSplitter
 from Template import Template
+from global_dict_list import global_dict_list
 
 
-# TXT IMPORT METHODU
-def import_txt():
-    file_path = filedialog.askopenfilename(filetypes=[("Text files", "*.txt")])
+# Import TXT or CSV files
+def import_file():
+    file_path = filedialog.askopenfilename(filetypes=[("Text files", "*.txt"), ("CSV files", "*.csv")])
     if file_path:
         file_path_entry.delete(0, tk.END)
         file_path_entry.insert(tk.END, file_path)
 
 
-# NEYLE IMPORT ETMİŞ ONU KONTROL EDİP AKSİYON ALIYO
+# Load dataset from TXT or CSV
 def load_dataset():
-    if file_path_entry.get():
-        with open(file_path_entry.get(), 'r') as file:
-            dataset = file.read()
+    file_path = file_path_entry.get()
+    if file_path:
+        if file_path.endswith('.txt'):
+            with open(file_path, 'r') as file:
+                dataset = file.read()
+        elif file_path.endswith('.csv'):
+            with open(file_path, 'r') as csvfile:
+                reader = csv.DictReader(csvfile)
+                dataset = ''
+                for row in reader:
+                    dataset += row['sentence'] + '\n'  # Concatenate sentences from CSV
+        else:
+            print("Unsupported file format.")
+            return
     else:
         dataset = text.get('1.0', tk.END)
 
@@ -34,15 +48,13 @@ def load_dataset():
     root.after(500, lambda: dataset_loaded(loading_label, dataset))
 
 
-# DATASET YÜKLENDİKTEN SONRA SORU KISMI
+# After dataset is loaded, present options to user
 def dataset_loaded(loading_label, dataset):
     loading_label.config(text="Dataset loaded successfully!")
-    print("Loaded dataset:", dataset)
 
     spacer_label = tk.Label(root, text="")
     spacer_label.pack(pady=20)
 
-    # HIGHLIGHTING CHOICE RADIO BUTTON KISMI
     preference_label = tk.Label(root,
                                 text="Do you want to highlight your own aspects or use our recommendation system?")
     preference_label.pack()
@@ -66,6 +78,7 @@ def dataset_loaded(loading_label, dataset):
     print("Divided sentences: ", sentences)
 
 
+# Confirm user choice and proceed accordingly
 def confirm_choice(choice, sentences):
     if choice == "Yes":
         print("User chose to highlight their own aspects.")
@@ -86,13 +99,11 @@ def confirm_choice(choice, sentences):
         canvas.configure(yscrollcommand=scrollbar.set)
 
         save_frame = tk.Frame(root, bg="#CCCCCC")
-        save_frame.pack(side="bottom", fill="x", padx=10, pady=5)  # Adjust frame padding as needed
+        save_frame.pack(side="bottom", fill="x", padx=10, pady=5)
 
-        # Create the save button inside the frame
         save_button = tk.Button(save_frame, text="Save", command=save_data)
-        save_button.pack(pady=5, ipadx=20, ipady=10)  # Adjust button padding and internal padding
+        save_button.pack(pady=5, ipadx=20, ipady=10)
 
-        # Center the frame horizontally
         save_frame.place(relx=0.5, rely=1.0, anchor="s", relwidth=1.0)
 
         def on_configure(event):
@@ -106,29 +117,53 @@ def confirm_choice(choice, sentences):
 
         for idx, input_text in enumerate(sentences):
             dct = {
-                "sentenceID":idx+1,
+                "sentenceID": idx + 1,
                 "sentence": input_text,
-                "list":[],
+                "list": [],
             }
+            global_dict_list.append(dct)
             template = Template(frame, id_num=idx + 1, text_list=input_text, dct=dct)
             template.grid(row=idx + 1, column=0, columnspan=3, padx=5, pady=5, sticky="ew")
 
-        # Bind mouse wheel events to the canvas for scrolling
         root.bind("<MouseWheel>", lambda event: scroll_canvas(event, canvas))
     else:
         print("User chose to use the recommendation system.")
         # Handle recommendation system
 
 
+# Scroll canvas based on mouse wheel events
 def scroll_canvas(event, canvas):
-    # Determine the direction of scrolling
     if event.delta > 0:
         canvas.yview_scroll(-1, "units")
     else:
         canvas.yview_scroll(1, "units")
+
+
+# Save data to file
 def save_data():
-    # Code to save data goes here
+    root = tk.Tk()
+    root.withdraw()  # Hide the main tkinter window
+
+    # Ask user for file path
+    file_path = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
+    if not file_path:
+        print("Save cancelled.")
+        return
+
+    # Write data to the chosen file path
+    with open(file_path, 'w', newline='') as csvfile:
+        fieldnames = ['sentenceID', 'sentence', 'list']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+        writer.writeheader()
+        for item in global_dict_list:
+            writer.writerow(item)
+
     print("Data saved successfully.")
+    sys.exit()
+
+
+# Create scrollable text widget
 def create_scrollable_text(parent):
     text_scroll = tk.Scrollbar(parent, orient=tk.VERTICAL)
     text_scroll.pack(side=tk.RIGHT, fill=tk.Y)
@@ -145,6 +180,7 @@ def create_scrollable_text(parent):
     return text_widget
 
 
+# Main Tkinter window
 root = tk.Tk()
 root.title("Dataset Loader")
 
@@ -165,7 +201,7 @@ file_label.grid(row=0, column=0)
 file_path_entry = tk.Entry(file_frame, width=40)
 file_path_entry.grid(row=0, column=1)
 
-browse_button = tk.Button(file_frame, text="Browse Files", command=import_txt)
+browse_button = tk.Button(file_frame, text="Browse Files", command=import_file)
 browse_button.grid(row=0, column=2)
 
 load_button = tk.Button(root, text="Load Dataset", command=load_dataset)

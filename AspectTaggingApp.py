@@ -1,17 +1,18 @@
 import tkinter as tk
 from tkinter import ttk
 
+from global_dict_list import global_dict_list
 
 
 class AspectTaggingApp(tk.Frame):
-    def __init__(self, master, sentence, dct, *args, **kwargs):
+    def __init__(self, master, sentence, dct, id_num, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
         self.sentence = sentence
         self.setup_widgets()
         self.dct = dct
-        x=str(self.sentence)
-        self.words=x.split()
-
+        self.id_num = id_num
+        x = str(self.sentence)
+        self.words = x.split()
 
     def setup_widgets(self):
         input_frame = tk.Frame(self)
@@ -84,12 +85,19 @@ class AspectTaggingApp(tk.Frame):
         print(self.sentence[int(unique_id.split(":")[0]):int(unique_id.split(":")[1])])
         list=[]
 
-        self.dct["list"].append([unique_id,aspect])
+        updated = False
+        for entry in self.dct["list"]:
+            if entry[0] == unique_id:  # Check if the unique ID is already in the list
+                entry[1] = aspect  # Update the aspect
+                updated = True
+                break
+        if not updated:
+            self.dct["list"].append([unique_id, aspect])
 
-
+        print("global_dict: ",global_dict_list)
         print(self.dct)
         print("word: ", word, " aspect value: ", aspect)
 
+
         # Close the aspect tagging window
         aspect_window.destroy()
-
