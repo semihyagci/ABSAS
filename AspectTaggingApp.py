@@ -1,36 +1,49 @@
 import tkinter as tk
 from tkinter import ttk
-
 from global_dict_list import global_dict_list
 
 
 class AspectTaggingApp(tk.Frame):
     def __init__(self, master, sentence, dct, id_num, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
+        self.master = master
         self.sentence = sentence
-        self.setup_widgets()
         self.dct = dct
         self.id_num = id_num
-        x = str(self.sentence)
-        self.words = x.split()
+        self.setup_widgets()
 
     def setup_widgets(self):
         input_frame = tk.Frame(self)
         input_frame.pack(fill=tk.X, padx=10, pady=5)
 
-        self.text = tk.Text(input_frame, wrap=tk.WORD, height=10, width=70)  # Adjust height and width as needed
+        self.text = tk.Text(input_frame, wrap=tk.WORD, height=10, width=70)
         self.text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        self.text.bind("<Double-Button-1>", self.tag_word)
-        # Scrollbar for the text widget
+
         scrollbar = tk.Scrollbar(input_frame, command=self.text.yview)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.text.config(yscrollcommand=scrollbar.set)
 
-        self.text.insert(tk.END, self.sentence + "\n\n")
-        self.text.config(state=tk.DISABLED)
-
-        # Bind MouseWheel event to the inner text widget
+        self.text.bind("<Double-Button-1>", self.tag_word)
         self.text.bind("<MouseWheel>", self.on_text_scroll)
+
+        # Pre-populate the text and apply aspects
+        self.prepopulate_text_with_aspects()
+
+    def prepopulate_text_with_aspects(self):
+        self.text.insert(tk.END, self.sentence + "\n\n")
+        color = {"Positive": "green", "Negative": "red", "Neutral": "gray"}
+
+        # Iterate through the list of aspects and apply them
+        for aspect_data in self.dct['list']:
+            unique_id, aspect = aspect_data
+            start_idx, end_idx = unique_id.split(":")
+            start = f"1.{start_idx}"
+            end = f"1.{end_idx}"
+
+            self.text.tag_add(aspect, start, end)
+            self.text.tag_configure(aspect, foreground=color.get(aspect, "black"))
+
+        self.text.config(state=tk.DISABLED)
 
     def on_text_scroll(self, event):
         # Determine the direction of scrolling
@@ -83,8 +96,10 @@ class AspectTaggingApp(tk.Frame):
         unique_id = (word_start.split(".")[1]) + ":" + word_end.split(".")[1]
         print("unique id: ", unique_id)
         print(self.sentence[int(unique_id.split(":")[0]):int(unique_id.split(":")[1])])
-        list=[]
 
+        for i, entry in enumerate(self.dct['list']):
+            if isinstance(entry, tuple):
+                self.dct['list'][i] = list(entry)
         updated = False
         for entry in self.dct["list"]:
             if entry[0] == unique_id:  # Check if the unique ID is already in the list
@@ -94,10 +109,9 @@ class AspectTaggingApp(tk.Frame):
         if not updated:
             self.dct["list"].append([unique_id, aspect])
 
-        print("global_dict: ",global_dict_list)
+        print("global_dict: ", global_dict_list)
         print(self.dct)
         print("word: ", word, " aspect value: ", aspect)
-
 
         # Close the aspect tagging window
         aspect_window.destroy()

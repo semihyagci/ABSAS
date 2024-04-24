@@ -17,7 +17,7 @@ class Template(tk.Frame):
         id_label.grid(row=0, column=0, padx=5, pady=5)
 
         # Aspect Tagging Widget
-        aspect_tagging_app = AspectTaggingApp(self, self.text_list, self.dct,self.id_num)
+        aspect_tagging_app = AspectTaggingApp(self, self.text_list, self.dct, self.id_num)
         aspect_tagging_app.grid(row=0, column=1, padx=5, pady=5)
 
         # Overall Aspect Dropdown

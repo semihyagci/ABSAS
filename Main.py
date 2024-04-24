@@ -4,15 +4,24 @@ import tkinter as tk
 from tkinter import filedialog
 from sentence_splitter import SentenceSplitter
 from Template import Template
+import ast
 from global_dict_list import global_dict_list
+import os
+
+global_filename = ""
 
 
 # Import TXT or CSV files
 def import_file():
+    global global_filename
     file_path = filedialog.askopenfilename(filetypes=[("Text files", "*.txt"), ("CSV files", "*.csv")])
     if file_path:
         file_path_entry.delete(0, tk.END)
         file_path_entry.insert(tk.END, file_path)
+
+        # Store the filename in the global variable
+        global_filename = os.path.basename(file_path)
+        print("Uploaded file:", global_filename)
 
 
 # Load dataset from TXT or CSV
@@ -79,7 +88,38 @@ def dataset_loaded(loading_label, dataset):
 
 
 # Confirm user choice and proceed accordingly
+
+def parse_list(list_str):
+    if not list_str.strip():
+        return []
+    else:
+        list_data = ast.literal_eval(list_str)  # Safely evaluate the string as a Python expression
+        return [(start, sentiment) for start, sentiment in list_data]
+
+
+def read_existing_csv(file_path):
+    data_dict = {}
+
+    with open(file_path, 'r') as csvfile:
+        # Create a CSV reader object
+        reader = csv.DictReader(csvfile)
+
+        # Iterate over each row in the CSV file
+        for row in reader:
+            # Extract data from the row
+            sentence_id = int(row['sentenceID'])
+            sentence = row['sentence']
+            list_data = parse_list(row['list'])
+
+            # Store the data in the dictionary
+            data_dict[sentence_id] = {'sentence': sentence, 'list': list_data}
+
+    formatted_data = [{'sentenceID': k, 'sentence': v['sentence'], 'list': v['list']} for k, v in data_dict.items()]
+    return formatted_data
+
+
 def confirm_choice(choice, sentences):
+    global global_filename
     if choice == "Yes":
         print("User chose to highlight their own aspects.")
         column_names = ["ID", "Text", "Overall Aspect"]
@@ -115,17 +155,24 @@ def confirm_choice(choice, sentences):
             label = tk.Label(frame, text=name)
             label.grid(row=0, column=col, padx=5, pady=5)
 
-        for idx, input_text in enumerate(sentences):
-            dct = {
-                "sentenceID": idx + 1,
-                "sentence": input_text,
-                "list": [],
-            }
-            global_dict_list.append(dct)
-            template = Template(frame, id_num=idx + 1, text_list=input_text, dct=dct)
-            template.grid(row=idx + 1, column=0, columnspan=3, padx=5, pady=5, sticky="ew")
+        if global_filename.endswith('.csv'):
+            mylist = read_existing_csv(global_filename)
+            for i in range(len(mylist)):
+                global_dict_list.append(mylist[i])
+                template = Template(frame, id_num=i + 1, text_list=mylist[i]['sentence'], dct=mylist[i])
+                template.grid(row=i + 1, column=0, columnspan=3, padx=5, pady=5, sticky="ew")
+        else:
+            for idx, input_text in enumerate(sentences):
+                dct = {
+                    "sentenceID": idx + 1,
+                    "sentence": input_text,
+                    "list": [],
+                }
+                global_dict_list.append(dct)
+                template = Template(frame, id_num=idx + 1, text_list=input_text, dct=dct)
+                template.grid(row=idx + 1, column=0, columnspan=3, padx=5, pady=5, sticky="ew")
 
-        root.bind("<MouseWheel>", lambda event: scroll_canvas(event, canvas))
+            root.bind("<MouseWheel>", lambda event: scroll_canvas(event, canvas))
     else:
         print("User chose to use the recommendation system.")
         # Handle recommendation system
