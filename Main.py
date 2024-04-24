@@ -3,14 +3,16 @@ from tkinter import filedialog
 from sentence_splitter import SentenceSplitter
 from Template import Template
 
-#TXT IMPORT METHODU
+
+# TXT IMPORT METHODU
 def import_txt():
     file_path = filedialog.askopenfilename(filetypes=[("Text files", "*.txt")])
     if file_path:
         file_path_entry.delete(0, tk.END)
         file_path_entry.insert(tk.END, file_path)
 
-#NEYLE IMPORT ETMİŞ ONU KONTROL EDİP AKSİYON ALIYO
+
+# NEYLE IMPORT ETMİŞ ONU KONTROL EDİP AKSİYON ALIYO
 def load_dataset():
     if file_path_entry.get():
         with open(file_path_entry.get(), 'r') as file:
@@ -29,19 +31,20 @@ def load_dataset():
     loading_label = tk.Label(root, text="Loading dataset...")
     loading_label.pack()
 
-    root.after(1000, lambda: dataset_loaded(loading_label,dataset))
+    root.after(500, lambda: dataset_loaded(loading_label, dataset))
 
 
-#DATASET YÜKLENDİKTEN SONRA SORU KISMI
-def dataset_loaded(loading_label,dataset):
+# DATASET YÜKLENDİKTEN SONRA SORU KISMI
+def dataset_loaded(loading_label, dataset):
     loading_label.config(text="Dataset loaded successfully!")
     print("Loaded dataset:", dataset)
 
     spacer_label = tk.Label(root, text="")
     spacer_label.pack(pady=20)
 
-   #HIGHLIGHTING CHOICE RADIO BUTTON KISMI
-    preference_label = tk.Label(root, text="Do you want to highlight your own aspects or use our recommendation system?")
+    # HIGHLIGHTING CHOICE RADIO BUTTON KISMI
+    preference_label = tk.Label(root,
+                                text="Do you want to highlight your own aspects or use our recommendation system?")
     preference_label.pack()
 
     preference_var = tk.StringVar(value="No")  # Default choice is "No"
@@ -57,24 +60,42 @@ def dataset_loaded(loading_label,dataset):
     splitter = SentenceSplitter(language='en')
     sentences = splitter.split(text=dataset)
 
-    confirm_button = tk.Button(root, text="Confirm", command=lambda: confirm_choice(preference_var.get(),sentences))
+    confirm_button = tk.Button(root, text="Confirm", command=lambda: confirm_choice(preference_var.get(), sentences))
     confirm_button.pack()
 
     print("Divided sentences: ", sentences)
 
 
-def confirm_choice(choice,sentences):
+def confirm_choice(choice, sentences):
     if choice == "Yes":
         print("User chose to highlight their own aspects.")
         column_names = ["ID", "Text", "Overall Aspect"]
         for widget in root.winfo_children():
             widget.destroy()
-        root.geometry("900x500")
+        root.geometry("750x500")
+
+        canvas = tk.Canvas(root)
+        canvas.pack(side="left", fill="both", expand=True)
+
+        scrollbar = tk.Scrollbar(root, orient="vertical", command=canvas.yview)
+        scrollbar.pack(side="right", fill="y")
+
+        frame = tk.Frame(canvas)
+        canvas.create_window((0, 0), window=frame, anchor="nw")
+
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        def on_configure(event):
+            canvas.configure(scrollregion=canvas.bbox("all"))
+
+        frame.bind("<Configure>", on_configure)
+
         for col, name in enumerate(column_names):
-            label = tk.Label(root, text=name)
+            label = tk.Label(frame, text=name)
             label.grid(row=0, column=col, padx=5, pady=5)
+
         for idx, input_text in enumerate(sentences):
-            template = Template(root, id_num=idx+1, text_list=input_text)
+            template = Template(frame, id_num=idx + 1, text_list=input_text)
             template.grid(row=idx + 1, column=0, columnspan=3, padx=5, pady=5, sticky="ew")
     else:
         print("User chose to use the recommendation system.")
@@ -95,6 +116,7 @@ def create_scrollable_text(parent):
     horizontal_scroll.config(command=text_widget.xview)
 
     return text_widget
+
 
 root = tk.Tk()
 root.title("Dataset Loader")
