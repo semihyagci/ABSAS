@@ -11,17 +11,27 @@ class AspectTaggingApp(tk.Frame):
         input_frame = tk.Frame(self)
         input_frame.pack(fill=tk.X, padx=10, pady=5)
 
-        self.text = tk.Text(input_frame, wrap=tk.WORD, height=15)
-        self.text.pack(fill=tk.BOTH, expand=True)
+        self.text = self.create_scrollable_text(input_frame)
         self.text.bind("<Double-Button-1>", self.tag_word)
-
-        # Scrollbar for the text widget
-        scrollbar = tk.Scrollbar(input_frame, command=self.text.yview)
-        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        self.text.config(yscrollcommand=scrollbar.set)
 
         self.text.insert(tk.END,self.sentences + "\n\n")
         self.text.config(state=tk.DISABLED)
+
+    def create_scrollable_text(self,parent):
+        text_scroll = tk.Scrollbar(parent, orient=tk.VERTICAL)
+        text_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+
+        horizontal_scroll = tk.Scrollbar(parent, orient=tk.HORIZONTAL)
+        horizontal_scroll.pack(side=tk.BOTTOM, fill=tk.X)
+
+        text_widget = tk.Text(parent, wrap=tk.NONE, yscrollcommand=text_scroll.set,
+                              xscrollcommand=horizontal_scroll.set)
+        text_widget.pack(expand=True, fill=tk.BOTH)
+
+        text_scroll.config(command=text_widget.yview)
+        horizontal_scroll.config(command=text_widget.xview)
+
+        return text_widget
 
     def tag_word(self, event):
         index = self.text.index(f"@{event.x},{event.y}")

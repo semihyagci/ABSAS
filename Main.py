@@ -29,7 +29,7 @@ def load_dataset():
     loading_label = tk.Label(root, text="Loading dataset...")
     loading_label.pack()
 
-    root.after(3000, lambda: dataset_loaded(loading_label,dataset))
+    root.after(1000, lambda: dataset_loaded(loading_label,dataset))
 
 
 #DATASET YÜKLENDİKTEN SONRA SORU KISMI
@@ -69,13 +69,12 @@ def confirm_choice(choice,sentences):
         column_names = ["ID", "Text", "Overall Aspect"]
         for widget in root.winfo_children():
             widget.destroy()
-        root.geometry("750x500")
-
+        root.geometry("900x500")
         for col, name in enumerate(column_names):
             label = tk.Label(root, text=name)
             label.grid(row=0, column=col, padx=5, pady=5)
         for idx, input_text in enumerate(sentences):
-            template = Template(root, id_num=idx + 1, text_list=input_text)
+            template = Template(root, id_num=idx+1, text_list=input_text)
             template.grid(row=idx + 1, column=0, columnspan=3, padx=5, pady=5, sticky="ew")
     else:
         print("User chose to use the recommendation system.")

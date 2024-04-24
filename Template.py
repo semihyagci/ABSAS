@@ -4,8 +4,8 @@ from AspectTaggingApp import AspectTaggingApp
 
 
 class Template(tk.Frame):
-    def init(self, master, id_num, text_list, args, **kwargs):
-        super().init(master,args, *kwargs)
+    def __init__(self, master, id_num, text_list, *args, **kwargs):
+        super().__init__(master, *args, **kwargs)
         self.id_num = id_num
         self.text_list = text_list
         self.create_widgets()
