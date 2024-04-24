@@ -105,13 +105,12 @@ def confirm_choice(choice, sentences):
             label.grid(row=0, column=col, padx=5, pady=5)
 
         for idx, input_text in enumerate(sentences):
-            dct={
-                "sentenceID":"",
-                "sentence": "",
-                "wordID":"",
-                "aspect":""
+            dct = {
+                "sentenceID":idx+1,
+                "sentence": input_text,
+                "list":[],
             }
-            template = Template(frame, id_num=idx + 1, text_list=input_text,dct=dct)
+            template = Template(frame, id_num=idx + 1, text_list=input_text, dct=dct)
             template.grid(row=idx + 1, column=0, columnspan=3, padx=5, pady=5, sticky="ew")
 
         # Bind mouse wheel events to the canvas for scrolling

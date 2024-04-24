@@ -63,10 +63,33 @@ class AspectTaggingApp(tk.Frame):
         confirm_button.pack(pady=5)
 
     def confirm_aspect(self, word_start, word_end, aspect, aspect_window):
-        color = {"Positive": "green", "Negative": "red", "Neutral": "gray"}.get(aspect, "black")
-        self.text.tag_add(aspect, word_start, word_end)
-        self.text.tag_configure(aspect, foreground=color)
-        word = self.text.get(word_start, word_end)
+        # Define aspect colors
+        color = {"Positive": "green", "Negative": "red", "Neutral": "gray"}
 
+        # Remove any existing aspect tags from this word
+        for tag in self.text.tag_names():
+            if tag in color:
+                self.text.tag_remove(tag, word_start, word_end)
+
+        # Apply the new aspect and configure its appearance
+        self.text.tag_add(aspect, word_start, word_end)
+        self.text.tag_configure(aspect, foreground=color.get(aspect, "black"))
+
+        # Optionally, save the word and aspect to the dictionary (shown here for completeness)
+        word = self.text.get(word_start, word_end)
+        print("word start: ", word_start.split(".")[1])
+        print("word end: ", word_end.split(".")[1])
+        unique_id = (word_start.split(".")[1]) + ":" + word_end.split(".")[1]
+        print("unique id: ", unique_id)
+        print(self.sentence[int(unique_id.split(":")[0]):int(unique_id.split(":")[1])])
+        list=[]
+
+        self.dct["list"].append([unique_id,aspect])
+
+
+        print(self.dct)
         print("word: ", word, " aspect value: ", aspect)
-        aspect_window.destroy()  # Close the aspect tagging window
+
+        # Close the aspect tagging window
+        aspect_window.destroy()
+

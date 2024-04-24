@@ -8,8 +8,9 @@ class Template(tk.Frame):
         super().__init__(master, *args, **kwargs)
         self.id_num = id_num
         self.text_list = text_list
+        self.dct = dct
         self.create_widgets()
-        self.dct=dct
+
 
     def create_widgets(self):
         # ID Label
@@ -17,7 +18,7 @@ class Template(tk.Frame):
         id_label.grid(row=0, column=0, padx=5, pady=5)
 
         # Aspect Tagging Widget
-        aspect_tagging_app = AspectTaggingApp(self, self.text_list,dict)
+        aspect_tagging_app = AspectTaggingApp(self, self.text_list,self.dct)
         aspect_tagging_app.grid(row=0, column=1, padx=5, pady=5)
 
         # Overall Aspect Dropdown
