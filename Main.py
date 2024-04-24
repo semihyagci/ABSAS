@@ -1,8 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog
 from sentence_splitter import SentenceSplitter
-from AspectTaggingApp import AspectTaggingApp
-
+from Template import Template
 
 #TXT IMPORT METHODU
 def import_txt():
@@ -67,9 +66,17 @@ def dataset_loaded(loading_label,dataset):
 def confirm_choice(choice,sentences):
     if choice == "Yes":
         print("User chose to highlight their own aspects.")
+        column_names = ["ID", "Text", "Overall Aspect"]
         for widget in root.winfo_children():
             widget.destroy()
-        app = AspectTaggingApp(root,sentences)
+        root.geometry("750x500")
+
+        for col, name in enumerate(column_names):
+            label = tk.Label(root, text=name)
+            label.grid(row=0, column=col, padx=5, pady=5)
+        for idx, input_text in enumerate(sentences):
+            template = Template(root, id_num=idx + 1, text_list=input_text)
+            template.grid(row=idx + 1, column=0, columnspan=3, padx=5, pady=5, sticky="ew")
     else:
         print("User chose to use the recommendation system.")
         # Handle recommendation system
