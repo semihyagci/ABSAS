@@ -4,11 +4,12 @@ from AspectTaggingApp import AspectTaggingApp
 
 
 class Template(tk.Frame):
-    def __init__(self, master, id_num, text_list, *args, **kwargs):
+    def __init__(self, master, id_num, text_list, dct, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
         self.id_num = id_num
         self.text_list = text_list
         self.create_widgets()
+        self.dct=dct
 
     def create_widgets(self):
         # ID Label
@@ -16,7 +17,7 @@ class Template(tk.Frame):
         id_label.grid(row=0, column=0, padx=5, pady=5)
 
         # Aspect Tagging Widget
-        aspect_tagging_app = AspectTaggingApp(self, self.text_list)
+        aspect_tagging_app = AspectTaggingApp(self, self.text_list,dict)
         aspect_tagging_app.grid(row=0, column=1, padx=5, pady=5)
 
         # Overall Aspect Dropdown

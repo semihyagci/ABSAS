@@ -2,11 +2,16 @@ import tkinter as tk
 from tkinter import ttk
 
 
+
 class AspectTaggingApp(tk.Frame):
-    def __init__(self, master, sentences, *args, **kwargs):
+    def __init__(self, master, sentence, dct, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
-        self.sentences = sentences
+        self.sentence = sentence
         self.setup_widgets()
+        self.dct = dct
+        x=str(self.sentence)
+        self.words=x.split()
+
 
     def setup_widgets(self):
         input_frame = tk.Frame(self)
@@ -20,7 +25,7 @@ class AspectTaggingApp(tk.Frame):
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.text.config(yscrollcommand=scrollbar.set)
 
-        self.text.insert(tk.END, self.sentences + "\n\n")
+        self.text.insert(tk.END, self.sentence + "\n\n")
         self.text.config(state=tk.DISABLED)
 
         # Bind MouseWheel event to the inner text widget
@@ -62,5 +67,6 @@ class AspectTaggingApp(tk.Frame):
         self.text.tag_add(aspect, word_start, word_end)
         self.text.tag_configure(aspect, foreground=color)
         word = self.text.get(word_start, word_end)
+
         print("word: ", word, " aspect value: ", aspect)
         aspect_window.destroy()  # Close the aspect tagging window

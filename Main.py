@@ -85,6 +85,16 @@ def confirm_choice(choice, sentences):
 
         canvas.configure(yscrollcommand=scrollbar.set)
 
+        save_frame = tk.Frame(root, bg="#CCCCCC")
+        save_frame.pack(side="bottom", fill="x", padx=10, pady=5)  # Adjust frame padding as needed
+
+        # Create the save button inside the frame
+        save_button = tk.Button(save_frame, text="Save", command=save_data)
+        save_button.pack(pady=5, ipadx=20, ipady=10)  # Adjust button padding and internal padding
+
+        # Center the frame horizontally
+        save_frame.place(relx=0.5, rely=1.0, anchor="s", relwidth=1.0)
+
         def on_configure(event):
             canvas.configure(scrollregion=canvas.bbox("all"))
 
@@ -95,7 +105,13 @@ def confirm_choice(choice, sentences):
             label.grid(row=0, column=col, padx=5, pady=5)
 
         for idx, input_text in enumerate(sentences):
-            template = Template(frame, id_num=idx + 1, text_list=input_text)
+            dct={
+                "sentenceID":"",
+                "sentence": "",
+                "wordID":"",
+                "aspect":""
+            }
+            template = Template(frame, id_num=idx + 1, text_list=input_text,dct=dct)
             template.grid(row=idx + 1, column=0, columnspan=3, padx=5, pady=5, sticky="ew")
 
         # Bind mouse wheel events to the canvas for scrolling
@@ -104,14 +120,16 @@ def confirm_choice(choice, sentences):
         print("User chose to use the recommendation system.")
         # Handle recommendation system
 
+
 def scroll_canvas(event, canvas):
     # Determine the direction of scrolling
     if event.delta > 0:
         canvas.yview_scroll(-1, "units")
     else:
         canvas.yview_scroll(1, "units")
-
-
+def save_data():
+    # Code to save data goes here
+    print("Data saved successfully.")
 def create_scrollable_text(parent):
     text_scroll = tk.Scrollbar(parent, orient=tk.VERTICAL)
     text_scroll.pack(side=tk.RIGHT, fill=tk.Y)
