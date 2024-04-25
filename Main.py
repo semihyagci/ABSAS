@@ -122,10 +122,10 @@ def confirm_choice(choice, sentences):
     global global_filename
     if choice == "Yes":
         print("User chose to highlight their own aspects.")
-        column_names = ["ID", "Text", "Overall Aspect"]
+        column_names = ["ID", "Text", "Overall Aspect","Additional Aspect"]
         for widget in root.winfo_children():
             widget.destroy()
-        root.geometry("750x500")
+        root.geometry("900x500")
 
         canvas = tk.Canvas(root)
         canvas.pack(side="left", fill="both", expand=True)

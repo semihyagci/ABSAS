@@ -8,8 +8,6 @@ class Template(tk.Frame):
         self.id_num = id_num
         self.text_list = text_list
         self.dct = dct
-        print("inside template ")
-        print("dict: ", dct)
         self.create_widgets()
 
     def create_widgets(self):
@@ -28,6 +26,19 @@ class Template(tk.Frame):
         self.aspect_var.set(overall_value)  # Set the initial value of the dropdown
         dropdown = tk.OptionMenu(self, self.aspect_var, *options)
         dropdown.grid(row=0, column=2, padx=5, pady=5)
+
+        #ADDITIONAL ASPECT PART
+        add_button = tk.Button(self, text="Add Additional Aspect", command=self.open_additional_aspect_dialog)
+        add_button.grid(row=0, column=3, padx=5, pady=5)
+
+    def open_additional_aspect_dialog(self):
+        # Define your logic to open another dialog here
+        # For example, create a new window/dialog
+        additional_aspect_dialog = tk.Toplevel(self)
+        additional_aspect_dialog.title("Additional Aspect")
+        # Add widgets to this dialog as needed
+
+
 
     def update_overall_aspect_dropdown(self, aspect):
         self.aspect_var.set(aspect)
