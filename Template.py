@@ -28,3 +28,6 @@ class Template(tk.Frame):
         self.aspect_var.set(overall_value)  # Set the initial value of the dropdown
         dropdown = tk.OptionMenu(self, self.aspect_var, *options)
         dropdown.grid(row=0, column=2, padx=5, pady=5)
+
+    def update_overall_aspect_dropdown(self, aspect):
+        self.aspect_var.set(aspect)

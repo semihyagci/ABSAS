@@ -92,8 +92,10 @@ class AspectTaggingApp(tk.Frame):
         confirm_button.pack(pady=5)
 
     def update_overall_aspect(self):
-        # Update the 'overall' aspect in the dictionary
-        self.dct['overall'] = self.calculate_overall_aspect()
+        overall_aspect = self.calculate_overall_aspect()
+        self.dct['overall'] = overall_aspect
+        #CALLBACK FUNCTION FOR OVERALL ASPECT VALUE
+        self.master.update_overall_aspect_dropdown(overall_aspect)
 
     def confirm_aspect(self, word_start, word_end, aspect, aspect_window):
         # Define aspect colors
