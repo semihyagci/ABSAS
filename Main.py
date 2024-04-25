@@ -6,7 +6,6 @@ from sentence_splitter import SentenceSplitter
 from Template import Template
 import ast
 from global_dict_list import global_dict_list
-import os
 
 global_filename = ""
 
@@ -19,8 +18,8 @@ def import_file():
         file_path_entry.delete(0, tk.END)
         file_path_entry.insert(tk.END, file_path)
 
-        # Store the filename in the global variable
-        global_filename = os.path.basename(file_path)
+        # Store the full file path in the global variable
+        global_filename = file_path
         print("Uploaded file:", global_filename)
 
 
@@ -110,11 +109,12 @@ def read_existing_csv(file_path):
             sentence_id = int(row['sentenceID'])
             sentence = row['sentence']
             list_data = parse_list(row['list'])
+            overall_aspect = row['overall']
 
             # Store the data in the dictionary
-            data_dict[sentence_id] = {'sentence': sentence, 'list': list_data}
+            data_dict[sentence_id] = {'sentence': sentence, 'list': list_data,'overall':overall_aspect}
 
-    formatted_data = [{'sentenceID': k, 'sentence': v['sentence'], 'list': v['list']} for k, v in data_dict.items()]
+    formatted_data = [{'sentenceID': k, 'sentence': v['sentence'], 'list': v['list'],'overall':v['overall']} for k, v in data_dict.items()]
     return formatted_data
 
 
@@ -156,6 +156,7 @@ def confirm_choice(choice, sentences):
             label.grid(row=0, column=col, padx=5, pady=5)
 
         if global_filename.endswith('.csv'):
+            print("global_filename: ", global_filename)
             mylist = read_existing_csv(global_filename)
             for i in range(len(mylist)):
                 global_dict_list.append(mylist[i])
@@ -167,12 +168,13 @@ def confirm_choice(choice, sentences):
                     "sentenceID": idx + 1,
                     "sentence": input_text,
                     "list": [],
+                    "overall": "Neutral"
                 }
                 global_dict_list.append(dct)
                 template = Template(frame, id_num=idx + 1, text_list=input_text, dct=dct)
                 template.grid(row=idx + 1, column=0, columnspan=3, padx=5, pady=5, sticky="ew")
 
-            root.bind("<MouseWheel>", lambda event: scroll_canvas(event, canvas))
+        root.bind("<MouseWheel>", lambda event: scroll_canvas(event, canvas))
     else:
         print("User chose to use the recommendation system.")
         # Handle recommendation system
@@ -199,7 +201,7 @@ def save_data():
 
     # Write data to the chosen file path
     with open(file_path, 'w', newline='') as csvfile:
-        fieldnames = ['sentenceID', 'sentence', 'list']
+        fieldnames = ['sentenceID', 'sentence', 'list','overall']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
         writer.writeheader()

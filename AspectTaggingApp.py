@@ -29,6 +29,21 @@ class AspectTaggingApp(tk.Frame):
         # Pre-populate the text and apply aspects
         self.prepopulate_text_with_aspects()
 
+    def calculate_overall_aspect(self):
+        # Count occurrences of each aspect
+        aspect_counts = {'Positive': 0, 'Neutral': 0, 'Negative': 0}
+        for _, aspect in self.dct['list']:
+            aspect_counts[aspect] += 1
+
+        # Determine the overall aspect based on counts
+        overall_aspect = 'Neutral'  # Default overall aspect
+        if aspect_counts['Positive'] > aspect_counts['Negative']:
+            overall_aspect = 'Positive'
+        elif aspect_counts['Negative'] > aspect_counts['Positive']:
+            overall_aspect = 'Negative'
+
+        return overall_aspect
+
     def prepopulate_text_with_aspects(self):
         self.text.insert(tk.END, self.sentence + "\n\n")
         color = {"Positive": "green", "Negative": "red", "Neutral": "gray"}
@@ -76,6 +91,10 @@ class AspectTaggingApp(tk.Frame):
                                                                        aspect_window))
         confirm_button.pack(pady=5)
 
+    def update_overall_aspect(self):
+        # Update the 'overall' aspect in the dictionary
+        self.dct['overall'] = self.calculate_overall_aspect()
+
     def confirm_aspect(self, word_start, word_end, aspect, aspect_window):
         # Define aspect colors
         color = {"Positive": "green", "Negative": "red", "Neutral": "gray"}
@@ -112,6 +131,7 @@ class AspectTaggingApp(tk.Frame):
         print("global_dict: ", global_dict_list)
         print(self.dct)
         print("word: ", word, " aspect value: ", aspect)
-
+        self.update_overall_aspect()
+        print("Overall aspect:", self.dct['overall'])
         # Close the aspect tagging window
         aspect_window.destroy()
