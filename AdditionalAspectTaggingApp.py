@@ -7,7 +7,7 @@ class AdditionalAspectTaggingApp(tk.Frame):
         super().__init__(master, *args, **kwargs)
         self.master = master
         self.sentence = sentence
-        self.dct = dct
+        self.dct= dct
         self.id_num = id_num
         self.setup_widgets()
 
@@ -31,23 +31,9 @@ class AdditionalAspectTaggingApp(tk.Frame):
         word_start = self.text.index(f"{index} wordstart")
         word_end = self.text.index(f"{index} wordend")
         word = self.text.get(word_start, word_end)
+        self.master.master.assign_selected_row(word)
 
-        aspect_window = tk.Toplevel(self)
-        aspect_window.title("Aspect Tagging")
 
-        aspect_label = tk.Label(aspect_window, text=f"Select aspect for the word: '{word}'")
-        aspect_label.pack(pady=10)
-
-        aspect_var = tk.StringVar()
-        aspect_var.set("Positive")  # Default aspect
-        aspect_options = ["Positive", "Neutral", "Negative"]
-        aspect_menu = ttk.Combobox(aspect_window, textvariable=aspect_var, values=aspect_options, state="readonly")
-        aspect_menu.pack(pady=5)
-
-        confirm_button = tk.Button(aspect_window, text="Confirm",
-                                   command=lambda: self.confirm_aspect(word_start, word_end, aspect_var.get(),
-                                                                       aspect_window))
-        confirm_button.pack(pady=5)
 
     def on_text_scroll(self, event):
         # Determine the direction of scrolling
@@ -57,16 +43,3 @@ class AdditionalAspectTaggingApp(tk.Frame):
         # Stop the event propagation to prevent scrolling the outer window
         return "break"
 
-    def confirm_aspect(self, word_start, word_end, aspect, aspect_window):
-        # Define aspect colors
-        color = {"Positive": "green", "Negative": "red", "Neutral": "gray"}
-
-        # Remove any existing aspect tags from this word
-        for tag in self.text.tag_names():
-            if tag in color:
-                self.text.tag_remove(tag, word_start, word_end)
-
-        # Apply the new aspect and configure its appearance
-        self.text.tag_add(aspect, word_start, word_end)
-        self.text.tag_configure(aspect, foreground=color.get(aspect, "black"))
-        aspect_window.destroy()
