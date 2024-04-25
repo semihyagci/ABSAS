@@ -42,8 +42,12 @@ class Template(tk.Frame):
         additional_aspect_dialog = tk.Toplevel(self)
         additional_aspect_dialog.title("Additional Aspect")
 
+        additional_aspect_dialog.geometry("500x300")
+
         content_template = AdditionalAspectTemplate(additional_aspect_dialog, self.id_num,self.text_list,self.dct)
         content_template.pack(padx=10, pady=10)
+
+
 
     def create_column_names(self):
         # ID column
