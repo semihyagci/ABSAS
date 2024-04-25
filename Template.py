@@ -1,4 +1,6 @@
 import tkinter as tk
+
+from AdditionalAspectTemplate import AdditionalAspectTemplate
 from AspectTaggingApp import AspectTaggingApp
 
 
@@ -17,11 +19,11 @@ class Template(tk.Frame):
             Template.column_names_created = True
         # ID Label
         id_label = tk.Label(self, text=f"ID: {self.id_num}")
-        id_label.grid(row=0, column=0, padx=5, pady=5)
+        id_label.grid(row=1, column=0, padx=5, pady=5)
 
         # Aspect Tagging Widget
         aspect_tagging_app = AspectTaggingApp(self, self.text_list, self.dct, self.id_num)
-        aspect_tagging_app.grid(row=0, column=1, padx=5, pady=5)
+        aspect_tagging_app.grid(row=1, column=1, padx=5, pady=5)
 
         # Overall Aspect Dropdown
         options = ["Positive", "Negative", "Neutral"]
@@ -29,18 +31,19 @@ class Template(tk.Frame):
         overall_value = self.dct.get('overall', 'Neutral')  # Get the value of 'overall', default to 'Neutral'
         self.aspect_var.set(overall_value)  # Set the initial value of the dropdown
         dropdown = tk.OptionMenu(self, self.aspect_var, *options)
-        dropdown.grid(row=0, column=2, padx=5, pady=5)
+        dropdown.grid(row=1, column=2, padx=5, pady=5)
 
         #ADDITIONAL ASPECT PART
         add_button = tk.Button(self, text="Add Additional Aspect", command=self.open_additional_aspect_dialog)
-        add_button.grid(row=0, column=3, padx=5, pady=5)
+        add_button.grid(row=1, column=3, padx=5, pady=5)
 
     def open_additional_aspect_dialog(self):
-        # Define your logic to open another dialog here
-        # For example, create a new window/dialog
+        # Create a Toplevel window for the additional aspect dialog
         additional_aspect_dialog = tk.Toplevel(self)
         additional_aspect_dialog.title("Additional Aspect")
-        # Add widgets to this dialog as needed
+
+        content_template = AdditionalAspectTemplate(additional_aspect_dialog, self.id_num,self.text_list,self.dct)
+        content_template.pack(padx=10, pady=10)
 
     def create_column_names(self):
         # ID column
