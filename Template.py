@@ -1,5 +1,6 @@
 import tkinter as tk
 
+from AdditionalAspectTaggingApp import AdditionalAspectTaggingApp
 from AdditionalAspectTemplate import AdditionalAspectTemplate
 from AspectTaggingApp import AspectTaggingApp
 
@@ -44,9 +45,16 @@ class Template(tk.Frame):
 
         additional_aspect_dialog.geometry("500x300")
 
-        content_template = AdditionalAspectTemplate(additional_aspect_dialog, self.id_num,self.text_list,self.dct)
-        content_template.pack(padx=10, pady=10)
+        id_label = tk.Label(additional_aspect_dialog, text=f"You are adding aspects to row with the ID: {self.id_num}.")
+        id_label.pack(anchor="w", padx=5, pady=5)
 
+        # Create label for "Text:"
+        text_label = tk.Label(additional_aspect_dialog, text="Text:")
+        text_label.pack(anchor="w", padx=5, pady=5)
+
+        # Create an instance of AdditionalAspectTaggingApp within the content frame
+        aspect_tagging_app = AdditionalAspectTaggingApp(additional_aspect_dialog, self.text_list, self.dct, self.id_num)
+        aspect_tagging_app.pack(anchor="w", padx=5, pady=5)
 
 
     def create_column_names(self):

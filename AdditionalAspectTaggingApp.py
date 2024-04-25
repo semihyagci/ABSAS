@@ -56,3 +56,17 @@ class AdditionalAspectTaggingApp(tk.Frame):
         self.text.yview_scroll(scroll_direction, "units")
         # Stop the event propagation to prevent scrolling the outer window
         return "break"
+
+    def confirm_aspect(self, word_start, word_end, aspect, aspect_window):
+        # Define aspect colors
+        color = {"Positive": "green", "Negative": "red", "Neutral": "gray"}
+
+        # Remove any existing aspect tags from this word
+        for tag in self.text.tag_names():
+            if tag in color:
+                self.text.tag_remove(tag, word_start, word_end)
+
+        # Apply the new aspect and configure its appearance
+        self.text.tag_add(aspect, word_start, word_end)
+        self.text.tag_configure(aspect, foreground=color.get(aspect, "black"))
+        aspect_window.destroy()
