@@ -121,8 +121,6 @@ def read_existing_csv(file_path):
 def confirm_choice(choice, sentences):
     global global_filename
     if choice == "Yes":
-        print("User chose to highlight their own aspects.")
-        column_names = ["ID", "Text", "Overall Aspect","Additional Aspect"]
         for widget in root.winfo_children():
             widget.destroy()
         root.geometry("900x500")
@@ -150,10 +148,6 @@ def confirm_choice(choice, sentences):
             canvas.configure(scrollregion=canvas.bbox("all"))
 
         frame.bind("<Configure>", on_configure)
-
-        for col, name in enumerate(column_names):
-            label = tk.Label(frame, text=name)
-            label.grid(row=0, column=col, padx=5, pady=5)
 
         if global_filename.endswith('.csv'):
             print("global_filename: ", global_filename)

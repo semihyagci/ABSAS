@@ -3,6 +3,7 @@ from AspectTaggingApp import AspectTaggingApp
 
 
 class Template(tk.Frame):
+    column_names_created = False
     def __init__(self, master, id_num, text_list, dct, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
         self.id_num = id_num
@@ -11,6 +12,9 @@ class Template(tk.Frame):
         self.create_widgets()
 
     def create_widgets(self):
+        if not Template.column_names_created:
+            self.create_column_names()
+            Template.column_names_created = True
         # ID Label
         id_label = tk.Label(self, text=f"ID: {self.id_num}")
         id_label.grid(row=0, column=0, padx=5, pady=5)
@@ -38,7 +42,22 @@ class Template(tk.Frame):
         additional_aspect_dialog.title("Additional Aspect")
         # Add widgets to this dialog as needed
 
+    def create_column_names(self):
+        # ID column
+        id_label = tk.Label(self, text="ID")
+        id_label.grid(row=0, column=0, padx=5, pady=5, sticky="n")
 
+        # Aspect Tagging column
+        aspect_label = tk.Label(self, text="Text")
+        aspect_label.grid(row=0, column=1, columnspan=1, padx=5, pady=1,sticky="n")
+
+        # Overall Aspect column
+        overall_label = tk.Label(self, text="Overall Aspect")
+        overall_label.grid(row=0, column=2, padx=5, pady=5, sticky="n")
+
+        # Additional Aspect column
+        add_label = tk.Label(self, text="Additional Aspect")
+        add_label.grid(row=0, column=3, padx=5, pady=5, sticky="n")
 
     def update_overall_aspect_dropdown(self, aspect):
         self.aspect_var.set(aspect)
