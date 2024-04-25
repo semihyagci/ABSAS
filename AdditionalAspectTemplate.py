@@ -19,12 +19,20 @@ class AdditionalAspectTemplate(tk.Frame):
         input_frame = tk.Frame(self)
         input_frame.grid(row=0, column=0, padx=5, pady=5, sticky="ew")
 
+        # id_label
+        id_label = tk.Label(input_frame, text=f"You are adding aspects to row with the ID: {self.id_num}.")
+        id_label.pack(anchor="w", padx=5, pady=5)
+
+        # selected_text_label
+        self.selected_text_label = tk.Label(input_frame, text=f"Selected text: {self.text}")
+        self.selected_text_label.pack(anchor="w", padx=5, pady=5)
+
         # Label for "Text:"
-        tk.Label(input_frame, text="Text:").grid(row=0, column=0, padx=0, pady=0)
+        tk.Label(input_frame, text="Text:").pack(anchor="w", padx=0, pady=0)
 
         # AdditionalAspectTaggingApp
         self.text_entry = AdditionalAspectTaggingApp(input_frame, self.text_list, self.dct, self.id_num)
-        self.text_entry.grid(row=0, column=1, padx=5, pady=5)
+        self.text_entry.pack(anchor="w", padx=5, pady=5)
 
         # Matrix Frame (Middle Frame)
         self.matrix_frame = tk.Frame(self)
@@ -73,7 +81,7 @@ class AdditionalAspectTemplate(tk.Frame):
 
     def assign_selected_row(self, word):
         self.text = word
-        print(self.text)
+        self.selected_text_label.config(text=f"Selected text: {self.text}")
 
     def import_from_csv(self):
         # Logic to import data from CSV
