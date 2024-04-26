@@ -45,9 +45,35 @@ class Template(tk.Frame):
 
         additional_aspect_dialog.geometry("500x300")
 
-        content_template = AdditionalAspectTemplate(additional_aspect_dialog,self.id_num,self.text_list,self.dct)
+        # Create a canvas and scrollbar for the Toplevel window
+        canvas = tk.Canvas(additional_aspect_dialog)
+        canvas.pack(side="left", fill="both", expand=True)
+
+        scrollbar = tk.Scrollbar(additional_aspect_dialog, orient="vertical", command=canvas.yview)
+        scrollbar.pack(side="right", fill="y")
+
+        frame = tk.Frame(canvas)
+        canvas.create_window((0, 0), window=frame, anchor="nw")
+
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        def on_configure(event):
+            canvas.configure(scrollregion=canvas.bbox("all"))
+
+        frame.bind("<Configure>", on_configure)
+
+        # Bind the mouse wheel event to the canvas
+        additional_aspect_dialog.bind("<MouseWheel>", lambda event: self.scroll_canvas_here(event, canvas))
+
+        # Create content for the scrollable frame
+        content_template = AdditionalAspectTemplate(frame, self.id_num, self.text_list, self.dct)
         content_template.pack(anchor="w", padx=5, pady=5)
 
+    def scroll_canvas_here(self, event, canvas):
+        if event.delta > 0:
+            canvas.yview_scroll(-1, "units")
+        else:
+            canvas.yview_scroll(1, "units")
 
     def create_column_names(self):
         # ID column

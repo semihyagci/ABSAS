@@ -110,11 +110,12 @@ def read_existing_csv(file_path):
             sentence = row['sentence']
             list_data = parse_list(row['list'])
             overall_aspect = row['overall']
+            additional_aspect_list = row['additional_aspect_list']
 
             # Store the data in the dictionary
-            data_dict[sentence_id] = {'sentence': sentence, 'list': list_data,'overall':overall_aspect}
+            data_dict[sentence_id] = {'sentence': sentence, 'list': list_data,'overall':overall_aspect,'additional_aspect_list':additional_aspect_list}
 
-    formatted_data = [{'sentenceID': k, 'sentence': v['sentence'], 'list': v['list'],'overall':v['overall']} for k, v in data_dict.items()]
+    formatted_data = [{'sentenceID': k, 'sentence': v['sentence'], 'list': v['list'],'overall':v['overall'],'additional_aspect_list':v['additional_aspect_list']} for k, v in data_dict.items()]
     return formatted_data
 
 
@@ -162,7 +163,8 @@ def confirm_choice(choice, sentences):
                     "sentenceID": idx + 1,
                     "sentence": input_text,
                     "list": [],
-                    "overall": "Neutral"
+                    "overall": "Neutral",
+                    "additional_aspect_list" : []
                 }
                 global_dict_list.append(dct)
                 template = Template(frame, id_num=idx + 1, text_list=input_text, dct=dct)
@@ -195,7 +197,7 @@ def save_data():
 
     # Write data to the chosen file path
     with open(file_path, 'w', newline='') as csvfile:
-        fieldnames = ['sentenceID', 'sentence', 'list','overall']
+        fieldnames = ['sentenceID', 'sentence', 'list','overall','additional_aspect_list']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
         writer.writeheader()

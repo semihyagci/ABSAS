@@ -7,6 +7,7 @@ from AdditionalAspectTaggingApp import AdditionalAspectTaggingApp
 
 class AdditionalAspectTemplate(tk.Frame):
     def __init__(self, master, id_num, text_list, dct, *args, **kwargs):
+        self.add_list = []
         super().__init__(master, *args, **kwargs)
         self.id_num = id_num
         self.text_list = text_list
@@ -51,7 +52,15 @@ class AdditionalAspectTemplate(tk.Frame):
         self.aspect_name_entry.grid(row=0, column=1, padx=5, pady=5)
         add_button = tk.Button(third_frame, text="Add Row", command=lambda: self.add_row(self.matrix_frame))
         add_button.grid(row=0, column=3, padx=5, pady=5)
-        import_button = tk.Button(third_frame, text="Import from CSV", command=self.import_from_csv)
+
+        def clear_entry():
+            self.aspect_name_entry.delete(0, 'end')
+
+        add_button = tk.Button(third_frame, text="Add Row",
+                               command=lambda: [self.add_row(self.matrix_frame), clear_entry()])
+        add_button.grid(row=0, column=3, padx=5, pady=5)
+
+        import_button = tk.Button(third_frame, text="Save", command=self.save_additional)
         import_button.grid(row=1, column=0, columnspan=4, padx=5, pady=5)
 
     def add_row(self, matrix_frame):
@@ -73,11 +82,14 @@ class AdditionalAspectTemplate(tk.Frame):
                                             values=["Neutral", "Positive", "Negative"])
         aspect_type_dropdown.grid(row=current_row_count, column=3, padx=5, pady=5)
         aspect_type = self.aspect_type_var.get()
-
+        print("aspect_type: ", aspect_type)
         # Update the matrix_frame with the new row
         tk.Label(matrix_frame, text=str(new_id)).grid(row=current_row_count, column=0, padx=5, pady=5)
         tk.Label(matrix_frame, text=aspect_name).grid(row=current_row_count, column=1, padx=5, pady=5)
         tk.Label(matrix_frame, text=matched_word).grid(row=current_row_count, column=2, padx=5, pady=5)
+        new_list = [aspect_name, matched_word, aspect_type]
+        print(new_list)
+        self.add_list.append(new_list)
 
     def assign_selected_row(self, word):
         self.text = word
@@ -86,3 +98,8 @@ class AdditionalAspectTemplate(tk.Frame):
     def import_from_csv(self):
         # Logic to import data from CSV
         pass
+
+    def save_additional(self):
+        self.dct['additional_aspect_list'] = self.add_list
+        print("dct in save_additional: ", self.dct)
+        self.destroy()
