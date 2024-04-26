@@ -14,6 +14,7 @@ class AdditionalAspectTemplate(tk.Frame):
         self.dct = dct
         self.text = ""
         self.create_widgets()
+        self.unique = ""
 
     def create_widgets(self):
         # Input Frame (Top Frame)
@@ -91,12 +92,13 @@ class AdditionalAspectTemplate(tk.Frame):
         tk.Label(matrix_frame, text=aspect_name).grid(row=current_row_count, column=1, padx=5, pady=5)
         tk.Label(matrix_frame, text=matched_word).grid(row=current_row_count, column=2, padx=5, pady=5)
 
-        new_list = [aspect_name, matched_word, aspect_type_var.get()]  # Get current value of aspect type
+        new_list = [aspect_name, self.unique, aspect_type_var.get()]  # Get current value of aspect type
         self.add_list.append(new_list)
 
-    def assign_selected_row(self, word):
+    def assign_selected_row(self, word,word_start,word_end):
         self.text = word
         self.selected_text_label.config(text=f"Selected text: {self.text}")
+        self.unique = (word_start.split(".")[1]) + ":" + word_end.split(".")[1]
 
     def import_from_csv(self):
         # Logic to import data from CSV

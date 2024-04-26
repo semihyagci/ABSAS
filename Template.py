@@ -7,6 +7,7 @@ from AspectTaggingApp import AspectTaggingApp
 
 class Template(tk.Frame):
     column_names_created = False
+
     def __init__(self, master, id_num, text_list, dct, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
         self.id_num = id_num
@@ -34,7 +35,7 @@ class Template(tk.Frame):
         dropdown = tk.OptionMenu(self, self.aspect_var, *options)
         dropdown.grid(row=1, column=2, padx=5, pady=5)
 
-        #ADDITIONAL ASPECT PART
+        # ADDITIONAL ASPECT PART
         add_button = tk.Button(self, text="Add Additional Aspect", command=self.open_additional_aspect_dialog)
         add_button.grid(row=1, column=3, padx=5, pady=5)
 
@@ -82,7 +83,7 @@ class Template(tk.Frame):
 
         # Aspect Tagging column
         aspect_label = tk.Label(self, text="Text")
-        aspect_label.grid(row=0, column=1, columnspan=1, padx=5, pady=1,sticky="n")
+        aspect_label.grid(row=0, column=1, columnspan=1, padx=5, pady=1, sticky="n")
 
         # Overall Aspect column
         overall_label = tk.Label(self, text="Overall Aspect")
