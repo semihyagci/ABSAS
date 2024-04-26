@@ -45,6 +45,23 @@ class AdditionalAspectTemplate(tk.Frame):
         for i, header in enumerate(headers):
             tk.Label(self.matrix_frame, text=header).grid(row=0, column=i, padx=5, pady=5)
 
+        if "additional_aspect_list" in self.dct:
+            for idx, aspect_tuple in enumerate(self.dct["additional_aspect_list"], start=1):
+                aspect_name, indices, aspect_type = aspect_tuple
+                start_index, end_index = map(int, indices.split(':'))
+                matched_word = self.text_list[int(start_index):int(end_index)]
+
+                # Update the matrix_frame with the existing data
+                tk.Label(self.matrix_frame, text=str(idx)).grid(row=idx, column=0, padx=5, pady=5)
+                tk.Label(self.matrix_frame, text=aspect_name).grid(row=idx, column=1, padx=5, pady=5)
+                tk.Label(self.matrix_frame, text=matched_word).grid(row=idx, column=2, padx=5, pady=5)
+
+                aspect_type_var = tk.StringVar(value=aspect_type)
+                aspect_type_dropdown = ttk.Combobox(self.matrix_frame, textvariable=aspect_type_var,
+                                                    values=["Neutral", "Positive", "Negative"])
+                aspect_type_dropdown.grid(row=idx, column=3, padx=5, pady=5)
+                aspect_type_dropdown.current(["Neutral", "Positive", "Negative"].index(aspect_type))
+
         # Third Frame (Bottom Frame)
         third_frame = tk.Frame(self)
         third_frame.grid(row=2, column=0, padx=5, pady=5, sticky="ew")
@@ -92,8 +109,8 @@ class AdditionalAspectTemplate(tk.Frame):
         tk.Label(matrix_frame, text=aspect_name).grid(row=current_row_count, column=1, padx=5, pady=5)
         tk.Label(matrix_frame, text=matched_word).grid(row=current_row_count, column=2, padx=5, pady=5)
 
-        new_list = [aspect_name, self.unique, aspect_type_var.get()]  # Get current value of aspect type
-        self.add_list.append(new_list)
+        new_tuple = (aspect_name, self.unique, aspect_type_var.get())  # Get current value of aspect type
+        self.add_list.append(new_tuple)
 
     def assign_selected_row(self, word,word_start,word_end):
         self.text = word
@@ -105,13 +122,28 @@ class AdditionalAspectTemplate(tk.Frame):
         pass
 
     def save_additional(self):
-        i=0
-        for widget in self.matrix_frame.winfo_children():
-            if isinstance(widget, ttk.Combobox):
-                oldest_aspect_type = widget.get()
-                self.add_list[i][2] = oldest_aspect_type# Capture the oldest aspect type value
-                i=i+1
+        updated_list = []
+        for aspect_tuple in self.add_list:
+            # Extract existing tuple elements
+            aspect_name, matched_word, aspect_type = aspect_tuple
 
+            # Update aspect_type with the current value from Combobox
+            for widget in self.matrix_frame.winfo_children():
+                if isinstance(widget, ttk.Combobox):
+                    aspect_type = widget.get()
+
+            # Create a new tuple with the updated aspect_type
+            updated_tuple = (aspect_name, matched_word, aspect_type)
+
+            # Append the updated tuple to the new list
+            updated_list.append(updated_tuple)
+
+        # Update self.add_list with the new list of updated tuples
+        self.add_list = updated_list
+
+        # Store the updated list of tuples in self.dct
         self.dct['additional_aspect_list'] = self.add_list
-        print("dct in save_additional: ", self.dct)
+        print("Updated additional aspect list:", self.dct['additional_aspect_list'])
+
+        # Close the window (assuming the parent master is a Toplevel window)
         self.master.master.master.destroy()

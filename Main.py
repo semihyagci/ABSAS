@@ -93,7 +93,7 @@ def parse_list(list_str):
         return []
     else:
         list_data = ast.literal_eval(list_str)  # Safely evaluate the string as a Python expression
-        return [(start, sentiment) for start, sentiment in list_data]
+        return list_data
 
 
 def read_existing_csv(file_path):
@@ -110,7 +110,7 @@ def read_existing_csv(file_path):
             sentence = row['sentence']
             list_data = parse_list(row['list'])
             overall_aspect = row['overall']
-            additional_aspect_list = row['additional_aspect_list']
+            additional_aspect_list = parse_list(row['additional_aspect_list'])
 
             # Store the data in the dictionary
             data_dict[sentence_id] = {'sentence': sentence, 'list': list_data,'overall':overall_aspect,'additional_aspect_list':additional_aspect_list}
