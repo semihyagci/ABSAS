@@ -74,22 +74,23 @@ class AspectTaggingApp(tk.Frame):
         word_end = self.text.index(f"{index} wordend")
         word = self.text.get(word_start, word_end)
 
-        aspect_window = tk.Toplevel(self)
-        aspect_window.title("Aspect Tagging")
+        if len(word) != 1:
+            aspect_window = tk.Toplevel(self)
+            aspect_window.title("Aspect Tagging")
 
-        aspect_label = tk.Label(aspect_window, text=f"Select aspect for the word: '{word}'")
-        aspect_label.pack(pady=10)
+            aspect_label = tk.Label(aspect_window, text=f"Select aspect for the word: '{word}'")
+            aspect_label.pack(pady=10)
 
-        aspect_var = tk.StringVar()
-        aspect_var.set("Positive")  # Default aspect
-        aspect_options = ["Positive", "Neutral", "Negative"]
-        aspect_menu = ttk.Combobox(aspect_window, textvariable=aspect_var, values=aspect_options, state="readonly")
-        aspect_menu.pack(pady=5)
+            aspect_var = tk.StringVar()
+            aspect_var.set("Positive")  # Default aspect
+            aspect_options = ["Positive", "Neutral", "Negative"]
+            aspect_menu = ttk.Combobox(aspect_window, textvariable=aspect_var, values=aspect_options, state="readonly")
+            aspect_menu.pack(pady=5)
 
-        confirm_button = tk.Button(aspect_window, text="Confirm",
+            confirm_button = tk.Button(aspect_window, text="Confirm",
                                    command=lambda: self.confirm_aspect(word_start, word_end, aspect_var.get(),
                                                                        aspect_window))
-        confirm_button.pack(pady=5)
+            confirm_button.pack(pady=5)
 
     def update_overall_aspect(self):
         overall_aspect = self.calculate_overall_aspect()

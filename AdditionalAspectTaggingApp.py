@@ -31,7 +31,8 @@ class AdditionalAspectTaggingApp(tk.Frame):
         word_start = self.text.index(f"{index} wordstart")
         word_end = self.text.index(f"{index} wordend")
         word = self.text.get(word_start, word_end)
-        self.master.master.assign_selected_row(word,word_start,word_end)
+        if len(word) != 1:
+            self.master.master.assign_selected_row(word,word_start,word_end)
 
     def on_text_scroll(self, event):
         # Determine the direction of scrolling

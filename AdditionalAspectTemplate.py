@@ -57,10 +57,9 @@ class AdditionalAspectTemplate(tk.Frame):
                 tk.Label(self.matrix_frame, text=matched_word).grid(row=idx, column=2, padx=5, pady=5)
 
                 aspect_type_var = tk.StringVar(value=aspect_type)
-                aspect_type_dropdown = ttk.Combobox(self.matrix_frame, textvariable=aspect_type_var,
-                                                    values=["Neutral", "Positive", "Negative"])
-                aspect_type_dropdown.grid(row=idx, column=3, padx=5, pady=5)
-                aspect_type_dropdown.current(["Neutral", "Positive", "Negative"].index(aspect_type))
+                aspect_type_var.set(aspect_type)
+                aspect_type_menu = tk.OptionMenu(self.matrix_frame, aspect_type_var, "Neutral", "Positive", "Negative")
+                aspect_type_menu.grid(row=idx, column=3, padx=5, pady=5)
 
         # Third Frame (Bottom Frame)
         third_frame = tk.Frame(self)
@@ -95,21 +94,18 @@ class AdditionalAspectTemplate(tk.Frame):
         matched_word = self.text
 
         # Create StringVar for aspect type
-        aspect_type_var = tk.StringVar(self,"Neutral")  # Separate StringVar for each row
-        aspect_type_var.set("Neutral")  # Default value
+        aspect_type_var = tk.StringVar(value="Neutral")  # Set the default value
 
-        # Create Combobox with StringVar
-        aspect_type_dropdown = ttk.Combobox(matrix_frame, textvariable=aspect_type_var,
-                                            values=["Neutral", "Positive", "Negative"])
-        aspect_type_dropdown.grid(row=current_row_count, column=3, padx=5, pady=5)
-        aspect_type_dropdown.current(0)  # Set the default value to "Neutral"
+        # Create OptionMenu with StringVar
+        aspect_type_menu = tk.OptionMenu(matrix_frame, aspect_type_var, "Neutral", "Positive", "Negative")
+        aspect_type_menu.grid(row=current_row_count, column=3, padx=5, pady=5)
 
         # Update the matrix_frame with the new row
         tk.Label(matrix_frame, text=str(new_id)).grid(row=current_row_count, column=0, padx=5, pady=5)
         tk.Label(matrix_frame, text=aspect_name).grid(row=current_row_count, column=1, padx=5, pady=5)
         tk.Label(matrix_frame, text=matched_word).grid(row=current_row_count, column=2, padx=5, pady=5)
 
-        new_tuple = (aspect_name, self.unique, aspect_type_var.get())  # Get current value of aspect type
+        new_tuple = (aspect_name, self.unique, aspect_type_var)  # Store aspect_type_var directly in the tuple
         self.add_list.append(new_tuple)
 
     def assign_selected_row(self, word,word_start,word_end):
@@ -123,27 +119,28 @@ class AdditionalAspectTemplate(tk.Frame):
 
     def save_additional(self):
         updated_list = []
-        for aspect_tuple in self.add_list:
-            # Extract existing tuple elements
-            aspect_name, matched_word, aspect_type = aspect_tuple
 
-            # Update aspect_type with the current value from Combobox
-            for widget in self.matrix_frame.winfo_children():
-                if isinstance(widget, ttk.Combobox):
-                    aspect_type = widget.get()
+        # Check if 'additional_aspect_list' exists in self.dct and is not None
+        if 'additional_aspect_list' in self.dct and self.dct['additional_aspect_list'] is not None:
+            # Use the existing list from self.dct
+            updated_list = self.dct['additional_aspect_list']
+
+        for aspect_tuple in self.add_list:
+            aspect_name, matched_word, aspect_type_var = aspect_tuple
+
+            # Get the string value of the aspect_type_var
+            aspect_type = aspect_type_var.get()
 
             # Create a new tuple with the updated aspect_type
             updated_tuple = (aspect_name, matched_word, aspect_type)
 
-            # Append the updated tuple to the new list
+            # Append the updated tuple to the updated_list
             updated_list.append(updated_tuple)
 
-        # Update self.add_list with the new list of updated tuples
-        self.add_list = updated_list
-
-        # Store the updated list of tuples in self.dct
-        self.dct['additional_aspect_list'] = self.add_list
+        # Update self.dct with the updated_list
+        self.dct['additional_aspect_list'] = updated_list
         print("Updated additional aspect list:", self.dct['additional_aspect_list'])
 
         # Close the window (assuming the parent master is a Toplevel window)
         self.master.master.master.destroy()
+
