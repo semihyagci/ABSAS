@@ -76,19 +76,22 @@ class AdditionalAspectTemplate(tk.Frame):
         # Matched Word
         matched_word = self.text
 
-        # Aspect Type
-        self.aspect_type_var = tk.StringVar(matrix_frame, "Neutral")  # Default value
-        aspect_type_dropdown = ttk.Combobox(matrix_frame, textvariable=self.aspect_type_var,
+        # Create StringVar for aspect type
+        aspect_type_var = tk.StringVar(self,"Neutral")  # Separate StringVar for each row
+        aspect_type_var.set("Neutral")  # Default value
+
+        # Create Combobox with StringVar
+        aspect_type_dropdown = ttk.Combobox(matrix_frame, textvariable=aspect_type_var,
                                             values=["Neutral", "Positive", "Negative"])
         aspect_type_dropdown.grid(row=current_row_count, column=3, padx=5, pady=5)
-        aspect_type = self.aspect_type_var.get()
-        print("aspect_type: ", aspect_type)
+        aspect_type_dropdown.current(0)  # Set the default value to "Neutral"
+
         # Update the matrix_frame with the new row
         tk.Label(matrix_frame, text=str(new_id)).grid(row=current_row_count, column=0, padx=5, pady=5)
         tk.Label(matrix_frame, text=aspect_name).grid(row=current_row_count, column=1, padx=5, pady=5)
         tk.Label(matrix_frame, text=matched_word).grid(row=current_row_count, column=2, padx=5, pady=5)
-        new_list = [aspect_name, matched_word, aspect_type]
-        print(new_list)
+
+        new_list = [aspect_name, matched_word, aspect_type_var.get()]  # Get current value of aspect type
         self.add_list.append(new_list)
 
     def assign_selected_row(self, word):
@@ -100,6 +103,13 @@ class AdditionalAspectTemplate(tk.Frame):
         pass
 
     def save_additional(self):
+        i=0
+        for widget in self.matrix_frame.winfo_children():
+            if isinstance(widget, ttk.Combobox):
+                oldest_aspect_type = widget.get()
+                self.add_list[i][2] = oldest_aspect_type# Capture the oldest aspect type value
+                i=i+1
+
         self.dct['additional_aspect_list'] = self.add_list
         print("dct in save_additional: ", self.dct)
-        self.destroy()
+        self.master.master.master.destroy()
