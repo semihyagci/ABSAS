@@ -36,7 +36,7 @@ class Template(tk.Frame):
         dropdown.grid(row=1, column=2, padx=5, pady=5)
 
         # Afinn Score Label
-        afinn_label = tk.Label(self, text=f"ID: {self.id_num}")
+        afinn_label = tk.Label(self, text=f"{self.dct['sentence_afinn_score']}")
         afinn_label.grid(row=1, column=3, padx=5, pady=5)
 
         # ADDITIONAL ASPECT PART

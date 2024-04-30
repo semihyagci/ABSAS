@@ -2,12 +2,32 @@ import csv
 import sys
 import tkinter as tk
 from tkinter import filedialog
-from sentence_splitter import SentenceSplitter
+import nltk
 from Template import Template
 import ast
 from global_dict_list import global_dict_list
+from afinn import Afinn
+from sentence_splitter import SentenceSplitter
 
 global_filename = ""
+
+
+def analyze_sentiment(sentence):
+    afinn = Afinn()
+    score = afinn.score(sentence)
+
+    sentiment = ""
+    if score > 0:
+        sentiment = "Positive"
+    elif score < 0:
+        sentiment = "Negative"
+    else:
+        sentiment = "Neutral"
+
+    print(sentiment)
+
+    return sentiment
+
 
 
 # Import TXT or CSV files
@@ -111,11 +131,14 @@ def read_existing_csv(file_path):
             list_data = parse_list(row['list'])
             overall_sentiment = row['overall']
             additional_aspect_list = parse_list(row['additional_aspect_list'])
+            afinn_score = row['sentence_afinn_score']
 
             # Store the data in the dictionary
-            data_dict[sentence_id] = {'sentence': sentence, 'list': list_data,'overall':overall_sentiment,'additional_aspect_list':additional_aspect_list}
+            data_dict[sentence_id] = {'sentence': sentence, 'list': list_data, 'overall': overall_sentiment,
+                                      'additional_aspect_list': additional_aspect_list, 'sentence_afinn_score':afinn_score}
 
-    formatted_data = [{'sentenceID': k, 'sentence': v['sentence'], 'list': v['list'],'overall':v['overall'],'additional_aspect_list':v['additional_aspect_list']} for k, v in data_dict.items()]
+    formatted_data = [{'sentenceID': k, 'sentence': v['sentence'], 'list': v['list'], 'overall': v['overall'],
+                       'additional_aspect_list': v['additional_aspect_list'], 'sentence_afinn_score': v['sentence_afinn_score'] } for k, v in data_dict.items()]
     return formatted_data
 
 
@@ -164,7 +187,8 @@ def confirm_choice(choice, sentences):
                     "sentence": input_text,
                     "list": [],
                     "overall": "Neutral",
-                    "additional_aspect_list" : []
+                    "additional_aspect_list": [],
+                    "sentence_afinn_score":"Neutral"
                 }
                 global_dict_list.append(dct)
                 template = Template(frame, id_num=idx + 1, text_list=input_text, dct=dct)
@@ -173,7 +197,57 @@ def confirm_choice(choice, sentences):
         root.bind("<MouseWheel>", lambda event: scroll_canvas(event, canvas))
     else:
         print("User chose to use the recommendation system.")
-        # Handle recommendation system
+        for widget in root.winfo_children():
+            widget.destroy()
+        root.geometry("1200x500")
+
+        canvas = tk.Canvas(root)
+        canvas.pack(side="left", fill="both", expand=True)
+
+        scrollbar = tk.Scrollbar(root, orient="vertical", command=canvas.yview)
+        scrollbar.pack(side="right", fill="y")
+
+        frame = tk.Frame(canvas)
+        canvas.create_window((0, 0), window=frame, anchor="nw")
+
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        save_frame = tk.Frame(root, bg="#CCCCCC")
+        save_frame.pack(side="bottom", fill="x", padx=10, pady=5)
+
+        save_button = tk.Button(save_frame, text="Save", command=save_data)
+        save_button.pack(pady=5, ipadx=20, ipady=10)
+
+        save_frame.place(relx=0.5, rely=1.0, anchor="s", relwidth=1.0)
+
+        def on_configure(event):
+            canvas.configure(scrollregion=canvas.bbox("all"))
+
+        frame.bind("<Configure>", on_configure)
+
+        if global_filename.endswith('.csv'):
+            print("global_filename: ", global_filename)
+            mylist = read_existing_csv(global_filename)
+            for i in range(len(mylist)):
+                global_dict_list.append(mylist[i])
+                template = Template(frame, id_num=i + 1, text_list=mylist[i]['sentence'], dct=mylist[i])
+                template.grid(row=i + 1, column=0, columnspan=3, padx=5, pady=5, sticky="ew")
+        else:
+            for idx, input_text in enumerate(sentences):
+                dct = {
+                    "sentenceID": idx + 1,
+                    "sentence": input_text,
+                    "list": [],
+                    "overall": "Neutral",
+                    "additional_aspect_list": [],
+                    "sentence_afinn_score": analyze_sentiment(input_text)
+                }
+                print("dct: ", dct)
+                global_dict_list.append(dct)
+                template = Template(frame, id_num=idx + 1, text_list=input_text, dct=dct)
+                template.grid(row=idx + 1, column=0, columnspan=3, padx=5, pady=5, sticky="ew")
+
+        root.bind("<MouseWheel>", lambda event: scroll_canvas(event, canvas))
 
 
 # Scroll canvas based on mouse wheel events
@@ -197,7 +271,7 @@ def save_data():
 
     # Write data to the chosen file path
     with open(file_path, 'w', newline='') as csvfile:
-        fieldnames = ['sentenceID', 'sentence', 'list','overall','additional_aspect_list']
+        fieldnames = ['sentenceID', 'sentence', 'list', 'overall', 'additional_aspect_list']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
         writer.writeheader()
