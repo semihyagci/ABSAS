@@ -1,7 +1,5 @@
 import tkinter as tk
 from tkinter import ttk
-from global_dict_list import global_dict_list
-
 
 class AspectTaggingApp(tk.Frame):
     def __init__(self, master, sentence, dct, id_num, *args, **kwargs):
@@ -23,7 +21,8 @@ class AspectTaggingApp(tk.Frame):
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.text.config(yscrollcommand=scrollbar.set)
 
-        self.text.bind("<Double-Button-1>", self.tag_word)
+        # Bind right-click event for multiple word tagging
+        self.text.bind("<Button-3>", self.on_right_click)
         self.text.bind("<MouseWheel>", self.on_text_scroll)
 
         # Pre-populate the text and apply aspects
@@ -68,29 +67,33 @@ class AspectTaggingApp(tk.Frame):
         # Stop the event propagation to prevent scrolling the outer window
         return "break"
 
-    def tag_word(self, event):
-        index = self.text.index(f"@{event.x},{event.y}")
-        word_start = self.text.index(f"{index} wordstart")
-        word_end = self.text.index(f"{index} wordend")
-        word = self.text.get(word_start, word_end)
+    def on_right_click(self, event):
+        start_index = self.text.index("sel.first")
+        end_index = self.text.index("sel.last")
+        if start_index and end_index:
+            self.tag_word_sequence(start_index, end_index)
 
-        if len(word) != 1:
-            aspect_window = tk.Toplevel(self)
-            aspect_window.title("Aspect Tagging")
+    def tag_word_sequence(self, start_index, end_index):
+        selected_text = self.text.get(start_index, end_index)
+        self.open_aspect_window(start_index, end_index, selected_text)
 
-            aspect_label = tk.Label(aspect_window, text=f"Select aspect for the word: '{word}'")
-            aspect_label.pack(pady=10)
+    def open_aspect_window(self, start_index, end_index, word):
+        aspect_window = tk.Toplevel(self)
+        aspect_window.title("Aspect Tagging")
 
-            aspect_var = tk.StringVar()
-            aspect_var.set("Positive")  # Default aspect
-            aspect_options = ["Positive", "Neutral", "Negative"]
-            aspect_menu = ttk.Combobox(aspect_window, textvariable=aspect_var, values=aspect_options, state="readonly")
-            aspect_menu.pack(pady=5)
+        aspect_label = tk.Label(aspect_window, text=f"Select aspect for the word: '{word}'")
+        aspect_label.pack(pady=10)
 
-            confirm_button = tk.Button(aspect_window, text="Confirm",
-                                   command=lambda: self.confirm_aspect(word_start, word_end, aspect_var.get(),
+        aspect_var = tk.StringVar()
+        aspect_var.set("Positive")  # Default aspect
+        aspect_options = ["Positive", "Neutral", "Negative"]
+        aspect_menu = ttk.Combobox(aspect_window, textvariable=aspect_var, values=aspect_options, state="readonly")
+        aspect_menu.pack(pady=5)
+
+        confirm_button = tk.Button(aspect_window, text="Confirm",
+                                   command=lambda: self.confirm_aspect(start_index, end_index, aspect_var.get(),
                                                                        aspect_window))
-            confirm_button.pack(pady=5)
+        confirm_button.pack(pady=5)
 
     def update_overall_sentiment(self):
         overall_sentiment = self.calculate_overall_sentiment()
@@ -113,11 +116,7 @@ class AspectTaggingApp(tk.Frame):
 
         # Optionally, save the word and aspect to the dictionary (shown here for completeness)
         word = self.text.get(word_start, word_end)
-        print("word start: ", word_start.split(".")[1])
-        print("word end: ", word_end.split(".")[1])
         unique_id = (word_start.split(".")[1]) + ":" + word_end.split(".")[1]
-        print("unique id: ", unique_id)
-        print(self.sentence[int(unique_id.split(":")[0]):int(unique_id.split(":")[1])])
 
         for i, entry in enumerate(self.dct['list']):
             if isinstance(entry, tuple):
@@ -131,10 +130,8 @@ class AspectTaggingApp(tk.Frame):
         if not updated:
             self.dct["list"].append([unique_id, aspect])
 
-        print("global_dict: ", global_dict_list)
-        print(self.dct)
-        print("word: ", word, " aspect value: ", aspect)
         self.update_overall_sentiment()
-        print("Overall sentiment:", self.dct['overall'])
-        # Close the aspect tagging window
+
         aspect_window.destroy()
+
+

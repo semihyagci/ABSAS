@@ -271,7 +271,7 @@ def save_data():
 
     # Write data to the chosen file path
     with open(file_path, 'w', newline='') as csvfile:
-        fieldnames = ['sentenceID', 'sentence', 'list', 'overall', 'additional_aspect_list']
+        fieldnames = ['sentenceID', 'sentence', 'list', 'overall', 'additional_aspect_list','sentence_afinn_score']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
         writer.writeheader()
