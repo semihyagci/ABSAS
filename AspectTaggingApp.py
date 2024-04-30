@@ -29,20 +29,20 @@ class AspectTaggingApp(tk.Frame):
         # Pre-populate the text and apply aspects
         self.prepopulate_text_with_aspects()
 
-    def calculate_overall_aspect(self):
+    def calculate_overall_sentiment(self):
         # Count occurrences of each aspect
-        aspect_counts = {'Positive': 0, 'Neutral': 0, 'Negative': 0}
+        sentiment_counts = {'Positive': 0, 'Neutral': 0, 'Negative': 0}
         for _, aspect in self.dct['list']:
-            aspect_counts[aspect] += 1
+            sentiment_counts[aspect] += 1
 
         # Determine the overall aspect based on counts
-        overall_aspect = 'Neutral'  # Default overall aspect
-        if aspect_counts['Positive'] > aspect_counts['Negative']:
-            overall_aspect = 'Positive'
-        elif aspect_counts['Negative'] > aspect_counts['Positive']:
-            overall_aspect = 'Negative'
+        overall_sentiment = 'Neutral'  # Default overall aspect
+        if sentiment_counts['Positive'] > sentiment_counts['Negative']:
+            overall_sentiment = 'Positive'
+        elif sentiment_counts['Negative'] > sentiment_counts['Positive']:
+            overall_sentiment = 'Negative'
 
-        return overall_aspect
+        return overall_sentiment
 
     def prepopulate_text_with_aspects(self):
         self.text.insert(tk.END, self.sentence + "\n\n")
@@ -92,11 +92,11 @@ class AspectTaggingApp(tk.Frame):
                                                                        aspect_window))
             confirm_button.pack(pady=5)
 
-    def update_overall_aspect(self):
-        overall_aspect = self.calculate_overall_aspect()
-        self.dct['overall'] = overall_aspect
-        #CALLBACK FUNCTION FOR OVERALL ASPECT VALUE
-        self.master.update_overall_aspect_dropdown(overall_aspect)
+    def update_overall_sentiment(self):
+        overall_sentiment = self.calculate_overall_sentiment()
+        self.dct['overall'] = overall_sentiment
+        #CALLBACK FUNCTION FOR OVERALL SENTIMENT VALUE
+        self.master.update_overall_sentiment_dropdown(overall_sentiment)
 
     def confirm_aspect(self, word_start, word_end, aspect, aspect_window):
         # Define aspect colors
@@ -134,7 +134,7 @@ class AspectTaggingApp(tk.Frame):
         print("global_dict: ", global_dict_list)
         print(self.dct)
         print("word: ", word, " aspect value: ", aspect)
-        self.update_overall_aspect()
-        print("Overall aspect:", self.dct['overall'])
+        self.update_overall_sentiment()
+        print("Overall sentiment:", self.dct['overall'])
         # Close the aspect tagging window
         aspect_window.destroy()

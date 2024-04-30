@@ -109,11 +109,11 @@ def read_existing_csv(file_path):
             sentence_id = int(row['sentenceID'])
             sentence = row['sentence']
             list_data = parse_list(row['list'])
-            overall_aspect = row['overall']
+            overall_sentiment = row['overall']
             additional_aspect_list = parse_list(row['additional_aspect_list'])
 
             # Store the data in the dictionary
-            data_dict[sentence_id] = {'sentence': sentence, 'list': list_data,'overall':overall_aspect,'additional_aspect_list':additional_aspect_list}
+            data_dict[sentence_id] = {'sentence': sentence, 'list': list_data,'overall':overall_sentiment,'additional_aspect_list':additional_aspect_list}
 
     formatted_data = [{'sentenceID': k, 'sentence': v['sentence'], 'list': v['list'],'overall':v['overall'],'additional_aspect_list':v['additional_aspect_list']} for k, v in data_dict.items()]
     return formatted_data
@@ -124,7 +124,7 @@ def confirm_choice(choice, sentences):
     if choice == "Yes":
         for widget in root.winfo_children():
             widget.destroy()
-        root.geometry("900x500")
+        root.geometry("1200x500")
 
         canvas = tk.Canvas(root)
         canvas.pack(side="left", fill="both", expand=True)
@@ -156,7 +156,7 @@ def confirm_choice(choice, sentences):
             for i in range(len(mylist)):
                 global_dict_list.append(mylist[i])
                 template = Template(frame, id_num=i + 1, text_list=mylist[i]['sentence'], dct=mylist[i])
-                template.grid(row=i + 1, column=0, columnspan=3, padx=5, pady=5, sticky="ew")
+                template.grid(row=i + 1, column=0, columnspan=5, padx=5, pady=5, sticky="ew")
         else:
             for idx, input_text in enumerate(sentences):
                 dct = {
@@ -168,7 +168,7 @@ def confirm_choice(choice, sentences):
                 }
                 global_dict_list.append(dct)
                 template = Template(frame, id_num=idx + 1, text_list=input_text, dct=dct)
-                template.grid(row=idx + 1, column=0, columnspan=3, padx=5, pady=5, sticky="ew")
+                template.grid(row=idx + 1, column=0, columnspan=5, padx=5, pady=5, sticky="ew")
 
         root.bind("<MouseWheel>", lambda event: scroll_canvas(event, canvas))
     else:
