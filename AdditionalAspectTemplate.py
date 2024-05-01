@@ -39,7 +39,7 @@ class AdditionalAspectTemplate(tk.Frame):
 
         if "additional_aspect_list" in self.dct:
             for idx, aspect_tuple in enumerate(self.dct["additional_aspect_list"], start=1):
-                indices,aspect_name, word, aspect_type = aspect_tuple
+                indices, aspect_name, word, aspect_type = aspect_tuple
                 start_index, end_index = map(str, indices.split(':'))
                 start = f"1.{start_index}"
                 end = f"1.{end_index}"
@@ -49,7 +49,7 @@ class AdditionalAspectTemplate(tk.Frame):
                 tk.Label(self.matrix_frame, text=aspect_name).grid(row=idx, column=1, padx=5, pady=5)
                 tk.Label(self.matrix_frame, text=word).grid(row=idx, column=2, padx=5, pady=5)
 
-                aspect_type_var = tk.StringVar(self,value=aspect_type)
+                aspect_type_var = tk.StringVar(self, value=aspect_type)
                 aspect_type_var.set(aspect_type)
                 aspect_type_menu = tk.OptionMenu(self.matrix_frame, aspect_type_var, "Neutral", "Positive", "Negative")
                 aspect_type_menu.grid(row=idx, column=3, padx=5, pady=5)
@@ -67,23 +67,23 @@ class AdditionalAspectTemplate(tk.Frame):
         def clear_entry():
             self.aspect_name_entry.delete(0, 'end')
 
+        # Dropdown menu
+
         add_button = tk.Button(third_frame, text="Add Row",
                                command=lambda: [self.add_row(self.matrix_frame), clear_entry()])
         add_button.grid(row=0, column=3, padx=5, pady=5)
 
-        # Dropdown menu
         self.csv_dropdown = tk.StringVar(self)
         self.csv_dropdown.set("")  # Set default value
 
-        self.dropdown_menu = tk.OptionMenu(self, self.csv_dropdown, "")
-        self.dropdown_menu.grid(row=1, column=4, padx=5, pady=5)
+        self.dropdown_menu = tk.OptionMenu(third_frame, self.csv_dropdown, "")
+        self.dropdown_menu.grid(row=0, column=4, padx=5, pady=5)
 
         import_csv_button = tk.Button(third_frame, text="Import from CSV", command=self.import_from_csv)
-        import_csv_button.grid(row=1, column=1,columnspan=4, padx=5, pady=5)
+        import_csv_button.grid(row=1, column=1, columnspan=4, padx=5, pady=5)
 
         save_button = tk.Button(third_frame, text="Save", command=self.save_additional)
         save_button.grid(row=1, column=0, columnspan=2, padx=5, pady=5)
-
 
     def add_row(self, matrix_frame):
         current_row_count = matrix_frame.grid_size()[1]
@@ -102,10 +102,10 @@ class AdditionalAspectTemplate(tk.Frame):
         tk.Label(matrix_frame, text=str(new_id)).grid(row=current_row_count, column=0, padx=5, pady=5)
         tk.Label(matrix_frame, text=aspect_name).grid(row=current_row_count, column=1, padx=5, pady=5)
         tk.Label(matrix_frame, text=matched_word).grid(row=current_row_count, column=2, padx=5, pady=5)
-        new_tuple = (self.unique,aspect_name, matched_word, aspect_type_var)
+        new_tuple = (self.unique, aspect_name, matched_word, aspect_type_var)
         self.add_list.append(new_tuple)
 
-    def assign_selected_row(self, word,word_start,word_end):
+    def assign_selected_row(self, word, word_start, word_end):
         self.text = word
         self.selected_text_label.config(text=f"Selected text: {self.text}")
         self.unique = (word_start.split(".")[1]) + ":" + word_end.split(".")[1]
@@ -121,6 +121,7 @@ class AdditionalAspectTemplate(tk.Frame):
         self.dropdown_menu['menu'].delete(0, 'end')  # Clear previous menu items
         for option in options:
             self.dropdown_menu['menu'].add_command(label=option, command=tk._setit(self.csv_dropdown, option))
+
     def save_additional(self):
         updated_list = []
 
@@ -148,4 +149,3 @@ class AdditionalAspectTemplate(tk.Frame):
         self.dct['additional_aspect_list'] = updated_list
         print("Updated additional aspect list:", self.dct['additional_aspect_list'])
         self.master.master.master.destroy()
-
