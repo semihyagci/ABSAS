@@ -71,6 +71,13 @@ class AdditionalAspectTemplate(tk.Frame):
                                command=lambda: [self.add_row(self.matrix_frame), clear_entry()])
         add_button.grid(row=0, column=3, padx=5, pady=5)
 
+        # Dropdown menu
+        self.csv_dropdown = tk.StringVar(self)
+        self.csv_dropdown.set("")  # Set default value
+
+        self.dropdown_menu = tk.OptionMenu(self, self.csv_dropdown, "")
+        self.dropdown_menu.grid(row=1, column=4, padx=5, pady=5)
+
         import_csv_button = tk.Button(third_frame, text="Import from CSV", command=self.import_from_csv)
         import_csv_button.grid(row=1, column=1,columnspan=4, padx=5, pady=5)
 
@@ -104,10 +111,16 @@ class AdditionalAspectTemplate(tk.Frame):
         self.unique = (word_start.split(".")[1]) + ":" + word_end.split(".")[1]
 
     def import_from_csv(self):
-        import_csv_dialog = ImportCSVDialog(self.master)
+        import_csv_dialog = ImportCSVDialog(self.master, self.update_dropdown)
         import_csv_dialog.grab_set()
         import_csv_dialog.focus_set()
 
+    def update_dropdown(self, options):
+        # Update dropdown menu with options from CSV
+        self.csv_dropdown.set("")  # Clear previous options
+        self.dropdown_menu['menu'].delete(0, 'end')  # Clear previous menu items
+        for option in options:
+            self.dropdown_menu['menu'].add_command(label=option, command=tk._setit(self.csv_dropdown, option))
     def save_additional(self):
         updated_list = []
 
