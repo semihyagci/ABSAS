@@ -1,6 +1,7 @@
 import tkinter as tk
 
 from AdditionalAspectTaggingApp import AdditionalAspectTaggingApp
+from ImportCSVDialog import ImportCSVDialog
 
 
 class AdditionalAspectTemplate(tk.Frame):
@@ -103,8 +104,9 @@ class AdditionalAspectTemplate(tk.Frame):
         self.unique = (word_start.split(".")[1]) + ":" + word_end.split(".")[1]
 
     def import_from_csv(self):
-        # Logic to import data from CSV
-        pass
+        import_csv_dialog = ImportCSVDialog(self.master)
+        import_csv_dialog.grab_set()
+        import_csv_dialog.focus_set()
 
     def save_additional(self):
         updated_list = []
