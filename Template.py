@@ -1,6 +1,5 @@
 import tkinter as tk
 
-from AdditionalAspectTaggingApp import AdditionalAspectTaggingApp
 from AdditionalAspectTemplate import AdditionalAspectTemplate
 from AspectTaggingApp import AspectTaggingApp
 
@@ -81,11 +80,9 @@ class Template(tk.Frame):
             canvas.yview_scroll(1, "units")
 
     def create_column_names(self):
-        # ID column
         column_frame = tk.Frame(self.master.master.master, bg="#CCCCCC")
         column_frame.pack(side="top", fill="x", padx=10, pady=(20, 5))  # Added vertical padding
 
-        # Create labels for column names
         column_names = ["ID", "Text", "Overall Sentiment", "Afinn Score", "Additional Aspect"]
         for i, col_name in enumerate(column_names):
             label = tk.Label(column_frame, text=col_name, bg="#CCCCCC", padx=10, pady=5, font=("Arial", 14, "bold"))
@@ -97,7 +94,6 @@ class Template(tk.Frame):
                 spacer_label.grid(row=0, column=(i * 2) - 1)  # Adjust column index for spacer label
             label.grid(row=0, column=i * 2)  # Adjust column index for column label
 
-        # Place the column frame at the top of the window
         column_frame.place(relx=0.5, rely=0, anchor="n", relwidth=1.0)
 
     def update_overall_sentiment_dropdown(self, aspect):

@@ -48,10 +48,12 @@ class AdditionalAspectTemplate(tk.Frame):
                 tk.Label(self.matrix_frame, text=aspect_name).grid(row=idx, column=1, padx=5, pady=5)
                 tk.Label(self.matrix_frame, text=word).grid(row=idx, column=2, padx=5, pady=5)
 
-                aspect_type_var = tk.StringVar(value=aspect_type)
+                aspect_type_var = tk.StringVar(self,value=aspect_type)
                 aspect_type_var.set(aspect_type)
                 aspect_type_menu = tk.OptionMenu(self.matrix_frame, aspect_type_var, "Neutral", "Positive", "Negative")
                 aspect_type_menu.grid(row=idx, column=3, padx=5, pady=5)
+
+                self.add_list.append((indices, aspect_name, word, aspect_type_var))
 
         third_frame = tk.Frame(self)
         third_frame.grid(row=2, column=0, padx=5, pady=5, sticky="ew")
@@ -92,7 +94,6 @@ class AdditionalAspectTemplate(tk.Frame):
         tk.Label(matrix_frame, text=str(new_id)).grid(row=current_row_count, column=0, padx=5, pady=5)
         tk.Label(matrix_frame, text=aspect_name).grid(row=current_row_count, column=1, padx=5, pady=5)
         tk.Label(matrix_frame, text=matched_word).grid(row=current_row_count, column=2, padx=5, pady=5)
-        print(matched_word)
         new_tuple = (self.unique,aspect_name, matched_word, aspect_type_var)
         self.add_list.append(new_tuple)
 
@@ -112,16 +113,24 @@ class AdditionalAspectTemplate(tk.Frame):
             updated_list = self.dct['additional_aspect_list']
 
         for aspect_tuple in self.add_list:
-            unique_id,aspect_name, matched_word, aspect_type_var = aspect_tuple
+            unique_id, aspect_name, matched_word, aspect_type_var = aspect_tuple
+            aspect_type = aspect_type_var.get()  # Get the current aspect_type_var value
 
-            aspect_type = aspect_type_var.get()
+            # Check if the aspect name already exists in updated_list
+            existing_index = None
+            for i, tup in enumerate(updated_list):
+                if tup[1] == aspect_name:
+                    existing_index = i
+                    break
 
-            updated_tuple = (unique_id, aspect_name, matched_word, aspect_type)
-
-            updated_list.append(updated_tuple)
+            if existing_index is not None:
+                # Update the aspect type if the aspect name already exists
+                updated_list[existing_index] = (unique_id, aspect_name, matched_word, aspect_type)
+            else:
+                # Otherwise, append a new tuple
+                updated_list.append((unique_id, aspect_name, matched_word, aspect_type))
 
         self.dct['additional_aspect_list'] = updated_list
         print("Updated additional aspect list:", self.dct['additional_aspect_list'])
-
         self.master.master.master.destroy()
 

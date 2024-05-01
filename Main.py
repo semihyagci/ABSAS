@@ -2,10 +2,7 @@ import csv
 import sys
 import tkinter as tk
 from tkinter import filedialog
-
-import nltk
 from pyabsa import ATEPCCheckpointManager
-
 from Template import Template
 import ast
 from global_dict_list import global_dict_list
@@ -24,45 +21,32 @@ def analyze_sentiment(sentence):
     else:
         sentiment = "Neutral"
 
-    print(sentiment)
-
     return sentiment
 
 
-def extract_aspects(sentence):
-    # Tokenize the sentence into words
-    words = nltk.word_tokenize(sentence)
-
-    # Use the aspect extractor to extract aspects and sentiments
+def extract_aspects(sentence,aspect_extractor):
     result = aspect_extractor.extract_aspect(inference_source=[sentence], pred_sentiment=True)
 
     aspects = result[0]['aspect']
-    sentiments = result[0]['sentiment']  # List of sentiments corresponding to aspects
+    sentiments = result[0]['sentiment']
 
     word_indices_sentiment_sentence = []
 
-    # Analyze each aspect to find matches in the sentence
     for aspect, sentiment in zip(aspects, sentiments):
-        # Find the start index of the aspect in the sentence
         index = sentence.find(aspect)
 
         while index != -1:
-            # Calculate end index for the aspect
             end_index = index + len(aspect)
 
-            # Create a unique ID for the aspect based on its position
             unique_id = f"{index}:{end_index}"
 
-            # Check if the aspect is a whole word
             if (index == 0 or not sentence[index - 1].isalpha()) and (end_index == len(sentence) or not sentence[end_index].isalpha()):
-                # Append the aspect, unique ID, and sentiment to the list
                 word_indices_sentiment_sentence.append([unique_id,aspect, sentiment])
 
-            # Find the next occurrence of the aspect in the sentence
             index = sentence.find(aspect, index + 1)
 
     return word_indices_sentiment_sentence
-# Import TXT or CSV files
+
 def import_file():
     global global_filename
     file_path = filedialog.askopenfilename(filetypes=[("Text files", "*.txt"), ("CSV files", "*.csv")])
@@ -70,12 +54,9 @@ def import_file():
         file_path_entry.delete(0, tk.END)
         file_path_entry.insert(tk.END, file_path)
 
-        # Store the full file path in the global variable
         global_filename = file_path
-        print("Uploaded file:", global_filename)
 
 
-# Load dataset from TXT or CSV
 def load_dataset():
     file_path = file_path_entry.get()
     if file_path:
@@ -108,7 +89,6 @@ def load_dataset():
     root.after(500, lambda: dataset_loaded(loading_label, dataset))
 
 
-# After dataset is loaded, present options to user
 def dataset_loaded(loading_label, dataset):
     loading_label.config(text="Dataset loaded successfully!")
 
@@ -116,10 +96,10 @@ def dataset_loaded(loading_label, dataset):
     spacer_label.pack(pady=20)
 
     preference_label = tk.Label(root,
-                                text="Do you want to highlight your own aspects or use our recommendation system?")
+                                text="Do you want to highlight your own aspects? (If you say no, our ABSA method will find all of the aspects.)")
     preference_label.pack()
 
-    preference_var = tk.StringVar(value="No")  # Default choice is "No"
+    preference_var = tk.StringVar(value="No")
     radio_frame = tk.Frame(root)
     radio_frame.pack()
 
@@ -135,16 +115,12 @@ def dataset_loaded(loading_label, dataset):
     confirm_button = tk.Button(root, text="Confirm", command=lambda: confirm_choice(preference_var.get(), sentences))
     confirm_button.pack()
 
-    print("Divided sentences: ", sentences)
-
-
-# Confirm user choice and proceed accordingly
 
 def parse_list(list_str):
     if not list_str.strip():
         return []
     else:
-        list_data = ast.literal_eval(list_str)  # Safely evaluate the string as a Python expression
+        list_data = ast.literal_eval(list_str)
         return list_data
 
 
@@ -152,12 +128,9 @@ def read_existing_csv(file_path):
     data_dict = {}
 
     with open(file_path, 'r') as csvfile:
-        # Create a CSV reader object
         reader = csv.DictReader(csvfile)
 
-        # Iterate over each row in the CSV file
         for row in reader:
-            # Extract data from the row
             sentence_id = int(row['sentenceID'])
             sentence = row['sentence']
             list_data = parse_list(row['list'])
@@ -165,7 +138,6 @@ def read_existing_csv(file_path):
             additional_aspect_list = parse_list(row['additional_aspect_list'])
             afinn_score = row['sentence_afinn_score']
 
-            # Store the data in the dictionary
             data_dict[sentence_id] = {'sentence': sentence, 'list': list_data, 'overall': overall_sentiment,
                                       'additional_aspect_list': additional_aspect_list, 'sentence_afinn_score':afinn_score}
 
@@ -206,11 +178,10 @@ def confirm_choice(choice, sentences):
         frame.bind("<Configure>", on_configure)
 
         if global_filename.endswith('.csv'):
-            print("global_filename: ", global_filename)
             mylist = read_existing_csv(global_filename)
             for i in range(len(mylist)):
-                if i == len(mylist) - 1:  # Check if it's the last instance
-                    bottom_padding = 60  # Set a different bottom padding for the last instance
+                if i == len(mylist) - 1:
+                    bottom_padding = 60
                 else:
                     bottom_padding = 5
 
@@ -219,10 +190,10 @@ def confirm_choice(choice, sentences):
                 template.grid(row=i + 1, column=0, columnspan=3, padx=5, pady=(30, bottom_padding), sticky="ew")
         else:
             for idx, input_text in enumerate(sentences):
-                if idx == len(sentences) - 1:  # Check if it's the last instance
-                    bottom_padding = 60  # Set a different bottom padding for the last instance
+                if idx == len(sentences) - 1:
+                    bottom_padding = 60
                 else:
-                    bottom_padding = 5 # Use the default bottom padding for other instances
+                    bottom_padding = 5
 
                 dct = {
                     "sentenceID": idx + 1,
@@ -232,14 +203,14 @@ def confirm_choice(choice, sentences):
                     "additional_aspect_list": [],
                     "sentence_afinn_score": analyze_sentiment(input_text)
                 }
-                print("dct: ", dct)
                 global_dict_list.append(dct)
                 template = Template(frame, id_num=idx + 1, text_list=input_text, dct=dct)
                 template.grid(row=idx + 1, column=0, columnspan=3, padx=5, pady=(30, bottom_padding), sticky="ew")
 
         root.bind("<MouseWheel>", lambda event: scroll_canvas(event, canvas))
     else:
-        print("User chose to use the recommendation system.")
+        aspect_extractor = ATEPCCheckpointManager.get_aspect_extractor(checkpoint='english', auto_device=True)
+
         for widget in root.winfo_children():
             widget.destroy()
         root.geometry("1200x700")
@@ -269,11 +240,10 @@ def confirm_choice(choice, sentences):
         frame.bind("<Configure>", on_configure)
 
         if global_filename.endswith('.csv'):
-            print("global_filename: ", global_filename)
             mylist = read_existing_csv(global_filename)
             for i in range(len(mylist)):
-                if i == len(mylist) - 1:  # Check if it's the last instance
-                    bottom_padding = 60  # Set a different bottom padding for the last instance
+                if i == len(mylist) - 1:
+                    bottom_padding = 60
                 else:
                     bottom_padding = 5
 
@@ -282,20 +252,19 @@ def confirm_choice(choice, sentences):
                 template.grid(row=i + 1, column=0, columnspan=3, padx=5, pady=(30, bottom_padding), sticky="ew")
         else:
             for idx, input_text in enumerate(sentences):
-                if idx == len(sentences) - 1:  # Check if it's the last instance
-                    bottom_padding = 60  # Set a different bottom padding for the last instance
+                if idx == len(sentences) - 1:
+                    bottom_padding = 60
                 else:
-                    bottom_padding = 5  # Use the default bottom padding for other instances
+                    bottom_padding = 5
 
                 dct = {
                     "sentenceID": idx + 1,
                     "sentence": input_text,
-                    "list": extract_aspects(input_text),
+                    "list": extract_aspects(input_text,aspect_extractor),
                     "overall": "Neutral",
                     "additional_aspect_list": [],
                     "sentence_afinn_score": analyze_sentiment(input_text)
                 }
-                print("dct: ", dct)
                 global_dict_list.append(dct)
                 template = Template(frame, id_num=idx + 1, text_list=input_text, dct=dct)
                 template.grid(row=idx + 1, column=0, columnspan=3, padx=5, pady=(30, bottom_padding), sticky="ew")
@@ -303,7 +272,6 @@ def confirm_choice(choice, sentences):
         root.bind("<MouseWheel>", lambda event: scroll_canvas(event, canvas))
 
 
-# Scroll canvas based on mouse wheel events
 def scroll_canvas(event, canvas):
     if event.delta > 0:
         canvas.yview_scroll(-1, "units")
@@ -311,18 +279,15 @@ def scroll_canvas(event, canvas):
         canvas.yview_scroll(1, "units")
 
 
-# Save data to file
 def save_data():
     root = tk.Tk()
-    root.withdraw()  # Hide the main tkinter window
+    root.withdraw()
 
-    # Ask user for file path
     file_path = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
     if not file_path:
         print("Save cancelled.")
         return
 
-    # Write data to the chosen file path
     with open(file_path, 'w', newline='') as csvfile:
         fieldnames = ['sentenceID', 'sentence', 'list', 'overall', 'additional_aspect_list','sentence_afinn_score']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -330,12 +295,9 @@ def save_data():
         writer.writeheader()
         for item in global_dict_list:
             writer.writerow(item)
-
-    print("Data saved successfully.")
     sys.exit()
 
 
-# Create scrollable text widget
 def create_scrollable_text(parent):
     text_scroll = tk.Scrollbar(parent, orient=tk.VERTICAL)
     text_scroll.pack(side=tk.RIGHT, fill=tk.Y)
@@ -352,11 +314,9 @@ def create_scrollable_text(parent):
     return text_widget
 
 
-# Main Tkinter window
 root = tk.Tk()
 root.title("Dataset Loader")
 
-aspect_extractor = ATEPCCheckpointManager.get_aspect_extractor(checkpoint='english', auto_device=True)
 afinn = Afinn()
 
 text_frame = tk.Frame(root)

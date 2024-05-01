@@ -60,8 +60,7 @@ class AspectTaggingApp(tk.Frame):
             start_idx, end_idx = unique_id.split(":")
             start = f"1.{start_idx}"
             end = f"1.{end_idx}"
-            print("start",start)
-            print("end", end)
+
             self.text.tag_add(aspect, start, end)
             self.text.tag_configure(aspect, foreground=color.get(aspect, "black"))
 
