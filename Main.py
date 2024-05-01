@@ -2,6 +2,7 @@ import csv
 import sys
 import tkinter as tk
 from tkinter import filedialog
+from pyabsa import ATEPCCheckpointManager
 from Template import Template
 import warnings
 import ast
