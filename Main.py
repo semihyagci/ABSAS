@@ -24,7 +24,7 @@ def analyze_sentiment(sentence):
     return sentiment
 
 
-def extract_aspects(sentence,aspect_extractor):
+def extract_aspects(sentence, aspect_extractor):
     result = aspect_extractor.extract_aspect(inference_source=[sentence], pred_sentiment=True)
 
     aspects = result[0]['aspect']
@@ -40,12 +40,14 @@ def extract_aspects(sentence,aspect_extractor):
 
             unique_id = f"{index}:{end_index}"
 
-            if (index == 0 or not sentence[index - 1].isalpha()) and (end_index == len(sentence) or not sentence[end_index].isalpha()):
-                word_indices_sentiment_sentence.append([unique_id,aspect, sentiment])
+            if (index == 0 or not sentence[index - 1].isalpha()) and (
+                    end_index == len(sentence) or not sentence[end_index].isalpha()):
+                word_indices_sentiment_sentence.append([unique_id, aspect, sentiment])
 
             index = sentence.find(aspect, index + 1)
 
     return word_indices_sentiment_sentence
+
 
 def import_file():
     global global_filename
@@ -139,10 +141,12 @@ def read_existing_csv(file_path):
             afinn_score = row['sentence_afinn_score']
 
             data_dict[sentence_id] = {'sentence': sentence, 'list': list_data, 'overall': overall_sentiment,
-                                      'additional_aspect_list': additional_aspect_list, 'sentence_afinn_score':afinn_score}
+                                      'additional_aspect_list': additional_aspect_list,
+                                      'sentence_afinn_score': afinn_score}
 
     formatted_data = [{'sentenceID': k, 'sentence': v['sentence'], 'list': v['list'], 'overall': v['overall'],
-                       'additional_aspect_list': v['additional_aspect_list'], 'sentence_afinn_score': v['sentence_afinn_score'] } for k, v in data_dict.items()]
+                       'additional_aspect_list': v['additional_aspect_list'],
+                       'sentence_afinn_score': v['sentence_afinn_score']} for k, v in data_dict.items()]
     return formatted_data
 
 
@@ -209,7 +213,6 @@ def confirm_choice(choice, sentences):
 
         root.bind("<MouseWheel>", lambda event: scroll_canvas(event, canvas))
     else:
-        aspect_extractor = ATEPCCheckpointManager.get_aspect_extractor(checkpoint='english', auto_device=True)
 
         for widget in root.winfo_children():
             widget.destroy()
@@ -251,6 +254,7 @@ def confirm_choice(choice, sentences):
                 template = Template(frame, id_num=i + 1, text_list=mylist[i]['sentence'], dct=mylist[i])
                 template.grid(row=i + 1, column=0, columnspan=3, padx=5, pady=(30, bottom_padding), sticky="ew")
         else:
+            aspect_extractor = ATEPCCheckpointManager.get_aspect_extractor(checkpoint='english', auto_device=True)
             for idx, input_text in enumerate(sentences):
                 if idx == len(sentences) - 1:
                     bottom_padding = 60
@@ -260,7 +264,7 @@ def confirm_choice(choice, sentences):
                 dct = {
                     "sentenceID": idx + 1,
                     "sentence": input_text,
-                    "list": extract_aspects(input_text,aspect_extractor),
+                    "list": extract_aspects(input_text, aspect_extractor),
                     "overall": "Neutral",
                     "additional_aspect_list": [],
                     "sentence_afinn_score": analyze_sentiment(input_text)
@@ -289,7 +293,7 @@ def save_data():
         return
 
     with open(file_path, 'w', newline='') as csvfile:
-        fieldnames = ['sentenceID', 'sentence', 'list', 'overall', 'additional_aspect_list','sentence_afinn_score']
+        fieldnames = ['sentenceID', 'sentence', 'list', 'overall', 'additional_aspect_list', 'sentence_afinn_score']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
         writer.writeheader()
