@@ -2,7 +2,6 @@ import csv
 import sys
 import tkinter as tk
 from tkinter import filedialog
-from pyabsa import ATEPCCheckpointManager
 from Template import Template
 import warnings
 import ast
@@ -10,8 +9,10 @@ from pyabsa import ATEPCCheckpointManager
 from global_dict_list import global_dict_list
 from afinn import Afinn
 from sentence_splitter import SentenceSplitter
+
 warnings.filterwarnings("ignore")
 global_filename = ""
+
 aspect_extractor = ATEPCCheckpointManager.get_aspect_extractor(checkpoint='english', auto_device=True)
 
 
@@ -81,6 +82,12 @@ def load_dataset():
     else:
         dataset = text.get('1.0', tk.END)
 
+    # Check if dataset is empty or contains only whitespace
+    if not dataset.strip():
+        print("Dataset is empty.")  # Debug message
+        tk.messagebox.showerror("Error", "Dataset is empty.")
+        return
+
     window_width = root.winfo_width()
     window_height = root.winfo_height()
 
@@ -102,7 +109,7 @@ def dataset_loaded(loading_label, dataset):
     spacer_label.pack(pady=20)
 
     preference_label = tk.Label(root,
-                                text="Do you want to highlight your own aspects? (If you say no, our ABSA method will find all of the aspects.)")
+                                text="Do you want to highlight your own aspects?\n (If you say no, our ABSA method will find all of the aspects.)")
     preference_label.pack()
 
     preference_var = tk.StringVar(value="No")

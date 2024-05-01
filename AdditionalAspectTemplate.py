@@ -92,17 +92,19 @@ class AdditionalAspectTemplate(tk.Frame):
     def add_row(self, matrix_frame):
         aspect_name_entry_value = self.aspect_name_entry.get()
         csv_dropdown_value = self.csv_dropdown.get()
+        matched_word = self.text
 
         if not aspect_name_entry_value and not csv_dropdown_value:
-            tk.messagebox.showerror("Error", "Please fill aspect name entry or select additional aspect from dropdown list")
+            tk.messagebox.showerror("Error",
+                                    "Please fill aspect name entry or select additional aspect from dropdown list")
             return
-
+        if len(matched_word) == 0:
+            tk.messagebox.showwarning("Warning", "No matched word provided.")
+            return
         current_row_count = matrix_frame.grid_size()[1]
         new_id = current_row_count
 
         aspect_name = aspect_name_entry_value or csv_dropdown_value
-
-        matched_word = self.text
 
         aspect_type_var = tk.StringVar(value="Neutral")
 
