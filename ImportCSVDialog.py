@@ -7,18 +7,29 @@ class ImportCSVDialog(tk.Toplevel):
     def __init__(self, master):
         super().__init__(master)
         self.title("Import from CSV")
-        self.geometry("300x100")
+        self.geometry("600x300")
 
         self.file_path = ""
 
-        browse_button = tk.Button(self, text="Browse Files", command=self.browse_files)
-        browse_button.pack(pady=10)
+        file_frame = tk.Frame(self)
+        file_frame.pack(pady=5)
 
-        start_tagging_button = tk.Button(self, text="Start Tagging", command=self.start_tagging)
-        start_tagging_button.pack(pady=5)
+        file_label = tk.Label(file_frame, text="File Path:")
+        file_label.grid(row=0, column=0)
+
+        self.file_path_entry = tk.Entry(file_frame, width=40)
+        self.file_path_entry.grid(row=0, column=1)
+
+        browse_button = tk.Button(file_frame, text="Browse Files", command=self.browse_files)
+        browse_button.grid(row=0, column=2)
+
+        load_button = tk.Button(self, text="Load Additional Aspects", command=self.start_tagging)
+        load_button.pack(pady=10)
 
     def browse_files(self):
         self.file_path = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
+        self.file_path_entry.delete(0, tk.END)
+        self.file_path_entry.insert(0, self.file_path)
 
     def start_tagging(self):
         if self.file_path:
@@ -32,24 +43,22 @@ class TaggingDialog(tk.Toplevel):
     def __init__(self, master, file_path):
         super().__init__(master)
         self.title("Tagging Dialog")
-        self.geometry("400x200")
+        self.geometry("600x300")
 
         self.file_path = file_path
 
-        # Read CSV file and extract values from 'Additional' column
-        self.additional_options = self.read_csv()
+        self.csv_content = self.read_csv_file()
 
-        # Dropdown menu to display options from 'Additional' column
-        self.selected_option = tk.StringVar(self)
-        self.selected_option.set("")  # Default value
-        dropdown_menu = tk.OptionMenu(self, self.selected_option, *self.additional_options)
-        dropdown_menu.pack(pady=10)
+    def read_csv_file(self):
+        csv_content = []
+        try:
+            with open(self.file_path, newline='', encoding='utf-8') as csvfile:
+                csv_reader = csv.reader(csvfile)
+                next(csv_reader)  # Skip the first row
+                for row in csv_reader:
+                    csv_content.append(row)
+        except Exception as e:
+            print(f"Error reading CSV file: {e}")
 
-    def read_csv(self):
-        additional_options = []
-        with open(self.file_path, 'r') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                if 'Additional' in row:
-                    additional_options.append(row['Additional'])
-        return additional_options
+        print(csv_content)
+        return csv_content
