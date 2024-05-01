@@ -38,14 +38,15 @@ class AdditionalAspectTemplate(tk.Frame):
 
         if "additional_aspect_list" in self.dct:
             for idx, aspect_tuple in enumerate(self.dct["additional_aspect_list"], start=1):
-                aspect_name, indices, aspect_type = aspect_tuple
-                start_index, end_index = map(int, indices.split(':'))
-                matched_word = self.text_list[int(start_index):int(end_index)]
-
+                indices,aspect_name, word, aspect_type = aspect_tuple
+                start_index, end_index = map(str, indices.split(':'))
+                start = f"1.{start_index}"
+                end = f"1.{end_index}"
+                # matched_word = self.text_entry.text.get(start, end)
                 # Update the matrix_frame with the existing data
                 tk.Label(self.matrix_frame, text=str(idx)).grid(row=idx, column=0, padx=5, pady=5)
                 tk.Label(self.matrix_frame, text=aspect_name).grid(row=idx, column=1, padx=5, pady=5)
-                tk.Label(self.matrix_frame, text=matched_word).grid(row=idx, column=2, padx=5, pady=5)
+                tk.Label(self.matrix_frame, text=word).grid(row=idx, column=2, padx=5, pady=5)
 
                 aspect_type_var = tk.StringVar(value=aspect_type)
                 aspect_type_var.set(aspect_type)
@@ -91,8 +92,8 @@ class AdditionalAspectTemplate(tk.Frame):
         tk.Label(matrix_frame, text=str(new_id)).grid(row=current_row_count, column=0, padx=5, pady=5)
         tk.Label(matrix_frame, text=aspect_name).grid(row=current_row_count, column=1, padx=5, pady=5)
         tk.Label(matrix_frame, text=matched_word).grid(row=current_row_count, column=2, padx=5, pady=5)
-
-        new_tuple = (aspect_name, self.unique, aspect_type_var)
+        print(matched_word)
+        new_tuple = (self.unique,aspect_name, matched_word, aspect_type_var)
         self.add_list.append(new_tuple)
 
     def assign_selected_row(self, word,word_start,word_end):
@@ -111,11 +112,11 @@ class AdditionalAspectTemplate(tk.Frame):
             updated_list = self.dct['additional_aspect_list']
 
         for aspect_tuple in self.add_list:
-            aspect_name, matched_word, aspect_type_var = aspect_tuple
+            unique_id,aspect_name, matched_word, aspect_type_var = aspect_tuple
 
             aspect_type = aspect_type_var.get()
 
-            updated_tuple = (aspect_name, matched_word, aspect_type)
+            updated_tuple = (unique_id, aspect_name, matched_word, aspect_type)
 
             updated_list.append(updated_tuple)
 

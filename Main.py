@@ -2,6 +2,10 @@ import csv
 import sys
 import tkinter as tk
 from tkinter import filedialog
+
+import nltk
+from pyabsa import ATEPCCheckpointManager
+
 from Template import Template
 import ast
 from global_dict_list import global_dict_list
@@ -12,10 +16,7 @@ global_filename = ""
 
 
 def analyze_sentiment(sentence):
-    afinn = Afinn()
     score = afinn.score(sentence)
-
-    sentiment = ""
     if score > 0:
         sentiment = "Positive"
     elif score < 0:
@@ -28,7 +29,39 @@ def analyze_sentiment(sentence):
     return sentiment
 
 
+def extract_aspects(sentence):
+    # Tokenize the sentence into words
+    words = nltk.word_tokenize(sentence)
 
+    # Use the aspect extractor to extract aspects and sentiments
+    result = aspect_extractor.extract_aspect(inference_source=[sentence], pred_sentiment=True)
+
+    aspects = result[0]['aspect']
+    sentiments = result[0]['sentiment']  # List of sentiments corresponding to aspects
+
+    word_indices_sentiment_sentence = []
+
+    # Analyze each aspect to find matches in the sentence
+    for aspect, sentiment in zip(aspects, sentiments):
+        # Find the start index of the aspect in the sentence
+        index = sentence.find(aspect)
+
+        while index != -1:
+            # Calculate end index for the aspect
+            end_index = index + len(aspect)
+
+            # Create a unique ID for the aspect based on its position
+            unique_id = f"{index}:{end_index}"
+
+            # Check if the aspect is a whole word
+            if (index == 0 or not sentence[index - 1].isalpha()) and (end_index == len(sentence) or not sentence[end_index].isalpha()):
+                # Append the aspect, unique ID, and sentiment to the list
+                word_indices_sentiment_sentence.append([unique_id,aspect, sentiment])
+
+            # Find the next occurrence of the aspect in the sentence
+            index = sentence.find(aspect, index + 1)
+
+    return word_indices_sentiment_sentence
 # Import TXT or CSV files
 def import_file():
     global global_filename
@@ -257,7 +290,7 @@ def confirm_choice(choice, sentences):
                 dct = {
                     "sentenceID": idx + 1,
                     "sentence": input_text,
-                    "list": [],
+                    "list": extract_aspects(input_text),
                     "overall": "Neutral",
                     "additional_aspect_list": [],
                     "sentence_afinn_score": analyze_sentiment(input_text)
@@ -322,6 +355,9 @@ def create_scrollable_text(parent):
 # Main Tkinter window
 root = tk.Tk()
 root.title("Dataset Loader")
+
+aspect_extractor = ATEPCCheckpointManager.get_aspect_extractor(checkpoint='english', auto_device=True)
+afinn = Afinn()
 
 text_frame = tk.Frame(root)
 text_frame.pack(padx=10, pady=5, fill=tk.BOTH, expand=True)

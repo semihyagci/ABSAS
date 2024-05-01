@@ -36,16 +36,16 @@ class AspectTaggingApp(tk.Frame):
         self.prepopulate_text_with_aspects()
 
     def calculate_overall_sentiment(self):
-        # Count occurrences of each aspect
-        sentiment_counts = {'Positive': 0, 'Neutral': 0, 'Negative': 0}
-        for _, aspect in self.dct['list']:
-            sentiment_counts[aspect] += 1
+        # Count occurrences of each aspect along with their words
+        sentiment_counts = {'Positive': [], 'Neutral': [], 'Negative': []}
+        for unique_id, word, aspect in self.dct['list']:
+            sentiment_counts[aspect].append((unique_id, word))
 
         # Determine the overall aspect based on counts
         overall_sentiment = 'Neutral'  # Default overall aspect
-        if sentiment_counts['Positive'] > sentiment_counts['Negative']:
+        if len(sentiment_counts['Positive']) > len(sentiment_counts['Negative']):
             overall_sentiment = 'Positive'
-        elif sentiment_counts['Negative'] > sentiment_counts['Positive']:
+        elif len(sentiment_counts['Negative']) > len(sentiment_counts['Positive']):
             overall_sentiment = 'Negative'
 
         return overall_sentiment
@@ -56,11 +56,12 @@ class AspectTaggingApp(tk.Frame):
 
         # Iterate through the list of aspects and apply them
         for aspect_data in self.dct['list']:
-            unique_id, aspect = aspect_data
+            unique_id, word, aspect = aspect_data
             start_idx, end_idx = unique_id.split(":")
             start = f"1.{start_idx}"
             end = f"1.{end_idx}"
-
+            print("start",start)
+            print("end", end)
             self.text.tag_add(aspect, start, end)
             self.text.tag_configure(aspect, foreground=color.get(aspect, "black"))
 
@@ -140,11 +141,12 @@ class AspectTaggingApp(tk.Frame):
         updated = False
         for entry in self.dct["list"]:
             if entry[0] == unique_id:  # Check if the unique ID is already in the list
-                entry[1] = aspect  # Update the aspect
+                entry[1] = word  # Update the word itself
+                entry[2] = aspect # Update the aspect
                 updated = True
                 break
         if not updated:
-            self.dct["list"].append([unique_id, aspect])
+            self.dct["list"].append((unique_id, word, aspect))  # Append the tuple
 
         self.update_overall_sentiment()
 
