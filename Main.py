@@ -146,7 +146,7 @@ def confirm_choice(choice, sentences):
     if choice == "Yes":
         for widget in root.winfo_children():
             widget.destroy()
-        root.geometry("1200x500")
+        root.geometry("1200x700")
 
         canvas = tk.Canvas(root)
         canvas.pack(side="left", fill="both", expand=True)
@@ -176,63 +176,21 @@ def confirm_choice(choice, sentences):
             print("global_filename: ", global_filename)
             mylist = read_existing_csv(global_filename)
             for i in range(len(mylist)):
+                if i == len(mylist) - 1:  # Check if it's the last instance
+                    bottom_padding = 60  # Set a different bottom padding for the last instance
+                else:
+                    bottom_padding = 5
+
                 global_dict_list.append(mylist[i])
                 template = Template(frame, id_num=i + 1, text_list=mylist[i]['sentence'], dct=mylist[i])
-                template.grid(row=i + 1, column=0, columnspan=5, padx=5, pady=5, sticky="ew")
+                template.grid(row=i + 1, column=0, columnspan=3, padx=5, pady=(30, bottom_padding), sticky="ew")
         else:
             for idx, input_text in enumerate(sentences):
-                dct = {
-                    "sentenceID": idx + 1,
-                    "sentence": input_text,
-                    "list": [],
-                    "overall": "Neutral",
-                    "additional_aspect_list": [],
-                    "sentence_afinn_score":"Neutral"
-                }
-                global_dict_list.append(dct)
-                template = Template(frame, id_num=idx + 1, text_list=input_text, dct=dct)
-                template.grid(row=idx + 1, column=0, columnspan=5, padx=5, pady=5, sticky="ew")
+                if idx == len(sentences) - 1:  # Check if it's the last instance
+                    bottom_padding = 60  # Set a different bottom padding for the last instance
+                else:
+                    bottom_padding = 5 # Use the default bottom padding for other instances
 
-        root.bind("<MouseWheel>", lambda event: scroll_canvas(event, canvas))
-    else:
-        print("User chose to use the recommendation system.")
-        for widget in root.winfo_children():
-            widget.destroy()
-        root.geometry("1200x500")
-
-        canvas = tk.Canvas(root)
-        canvas.pack(side="left", fill="both", expand=True)
-
-        scrollbar = tk.Scrollbar(root, orient="vertical", command=canvas.yview)
-        scrollbar.pack(side="right", fill="y")
-
-        frame = tk.Frame(canvas)
-        canvas.create_window((0, 0), window=frame, anchor="nw")
-
-        canvas.configure(yscrollcommand=scrollbar.set)
-
-        save_frame = tk.Frame(root, bg="#CCCCCC")
-        save_frame.pack(side="bottom", fill="x", padx=10, pady=5)
-
-        save_button = tk.Button(save_frame, text="Save", command=save_data)
-        save_button.pack(pady=5, ipadx=20, ipady=10)
-
-        save_frame.place(relx=0.5, rely=1.0, anchor="s", relwidth=1.0)
-
-        def on_configure(event):
-            canvas.configure(scrollregion=canvas.bbox("all"))
-
-        frame.bind("<Configure>", on_configure)
-
-        if global_filename.endswith('.csv'):
-            print("global_filename: ", global_filename)
-            mylist = read_existing_csv(global_filename)
-            for i in range(len(mylist)):
-                global_dict_list.append(mylist[i])
-                template = Template(frame, id_num=i + 1, text_list=mylist[i]['sentence'], dct=mylist[i])
-                template.grid(row=i + 1, column=0, columnspan=3, padx=5, pady=5, sticky="ew")
-        else:
-            for idx, input_text in enumerate(sentences):
                 dct = {
                     "sentenceID": idx + 1,
                     "sentence": input_text,
@@ -244,7 +202,70 @@ def confirm_choice(choice, sentences):
                 print("dct: ", dct)
                 global_dict_list.append(dct)
                 template = Template(frame, id_num=idx + 1, text_list=input_text, dct=dct)
-                template.grid(row=idx + 1, column=0, columnspan=3, padx=5, pady=5, sticky="ew")
+                template.grid(row=idx + 1, column=0, columnspan=3, padx=5, pady=(30, bottom_padding), sticky="ew")
+
+        root.bind("<MouseWheel>", lambda event: scroll_canvas(event, canvas))
+    else:
+        print("User chose to use the recommendation system.")
+        for widget in root.winfo_children():
+            widget.destroy()
+        root.geometry("1200x700")
+
+        canvas = tk.Canvas(root)
+        canvas.pack(side="left", fill="both", expand=True)
+
+        scrollbar = tk.Scrollbar(root, orient="vertical", command=canvas.yview)
+        scrollbar.pack(side="right", fill="y")
+
+        frame = tk.Frame(canvas)
+        canvas.create_window((0, 0), window=frame, anchor="nw")
+
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        save_frame = tk.Frame(root, bg="#CCCCCC")
+        save_frame.pack(side="bottom", fill="x", padx=10, pady=5)
+
+        save_button = tk.Button(save_frame, text="Save", command=save_data)
+        save_button.pack(pady=5, ipadx=20, ipady=10)
+
+        save_frame.place(relx=0.5, rely=1.0, anchor="s", relwidth=1.0)
+
+        def on_configure(event):
+            canvas.configure(scrollregion=canvas.bbox("all"))
+
+        frame.bind("<Configure>", on_configure)
+
+        if global_filename.endswith('.csv'):
+            print("global_filename: ", global_filename)
+            mylist = read_existing_csv(global_filename)
+            for i in range(len(mylist)):
+                if i == len(mylist) - 1:  # Check if it's the last instance
+                    bottom_padding = 60  # Set a different bottom padding for the last instance
+                else:
+                    bottom_padding = 5
+
+                global_dict_list.append(mylist[i])
+                template = Template(frame, id_num=i + 1, text_list=mylist[i]['sentence'], dct=mylist[i])
+                template.grid(row=i + 1, column=0, columnspan=3, padx=5, pady=(30, bottom_padding), sticky="ew")
+        else:
+            for idx, input_text in enumerate(sentences):
+                if idx == len(sentences) - 1:  # Check if it's the last instance
+                    bottom_padding = 60  # Set a different bottom padding for the last instance
+                else:
+                    bottom_padding = 5  # Use the default bottom padding for other instances
+
+                dct = {
+                    "sentenceID": idx + 1,
+                    "sentence": input_text,
+                    "list": [],
+                    "overall": "Neutral",
+                    "additional_aspect_list": [],
+                    "sentence_afinn_score": analyze_sentiment(input_text)
+                }
+                print("dct: ", dct)
+                global_dict_list.append(dct)
+                template = Template(frame, id_num=idx + 1, text_list=input_text, dct=dct)
+                template.grid(row=idx + 1, column=0, columnspan=3, padx=5, pady=(30, bottom_padding), sticky="ew")
 
         root.bind("<MouseWheel>", lambda event: scroll_canvas(event, canvas))
 
