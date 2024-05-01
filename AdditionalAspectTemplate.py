@@ -67,8 +67,6 @@ class AdditionalAspectTemplate(tk.Frame):
         def clear_entry():
             self.aspect_name_entry.delete(0, 'end')
 
-        # Dropdown menu
-
         add_button = tk.Button(third_frame, text="Add Row",
                                command=lambda: [self.add_row(self.matrix_frame), clear_entry()])
         add_button.grid(row=0, column=3, padx=5, pady=5)
@@ -85,12 +83,24 @@ class AdditionalAspectTemplate(tk.Frame):
         save_button = tk.Button(third_frame, text="Save", command=self.save_additional)
         save_button.grid(row=1, column=0, columnspan=2, padx=5, pady=5)
 
-    def add_row(self, matrix_frame):
-        current_row_count = matrix_frame.grid_size()[1]
+        clear_button = tk.Button(third_frame, text="Clear Selection", command=self.clear_dropdown_selection)
+        clear_button.grid(row=0, column=5, padx=5, pady=5)
 
+    def clear_dropdown_selection(self):
+        self.csv_dropdown.set("")
+
+    def add_row(self, matrix_frame):
+        aspect_name_entry_value = self.aspect_name_entry.get()
+        csv_dropdown_value = self.csv_dropdown.get()
+
+        if not aspect_name_entry_value and not csv_dropdown_value:
+            tk.messagebox.showerror("Error", "Please fill aspect name entry or select additional aspect from dropdown list")
+            return
+
+        current_row_count = matrix_frame.grid_size()[1]
         new_id = current_row_count
 
-        aspect_name = self.aspect_name_entry.get()
+        aspect_name = aspect_name_entry_value or csv_dropdown_value
 
         matched_word = self.text
 
@@ -121,6 +131,8 @@ class AdditionalAspectTemplate(tk.Frame):
         self.dropdown_menu['menu'].delete(0, 'end')  # Clear previous menu items
         for option in options:
             self.dropdown_menu['menu'].add_command(label=option, command=tk._setit(self.csv_dropdown, option))
+        if options:
+            self.csv_dropdown.set(options[0])
 
     def save_additional(self):
         updated_list = []

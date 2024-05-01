@@ -47,7 +47,7 @@ class Template(tk.Frame):
         additional_aspect_dialog = tk.Toplevel(self)
         additional_aspect_dialog.title("Additional Aspect")
 
-        additional_aspect_dialog.geometry("600x300")
+        additional_aspect_dialog.geometry("800x300")
 
         # Create a canvas and scrollbar for the Toplevel window
         canvas = tk.Canvas(additional_aspect_dialog)
