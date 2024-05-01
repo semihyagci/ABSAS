@@ -81,21 +81,16 @@ class AspectTaggingApp(tk.Frame):
             self.tag_word_sequence(start_index, end_index)
 
     def tag_word_sequence(self, start_index, end_index):
-        # Get the selected text
         selected_text = self.text.get(start_index, end_index)
 
-        # Remove punctuation marks using regular expressions
         cleaned_text = re.sub(r'[^\w\s]', '', selected_text)
 
-        # Find the cleaned text within the original text
         match = re.search(re.escape(cleaned_text), selected_text)
 
         if match:
-            # Calculate the start and end indices of the cleaned text within the selected text
             cleaned_start_idx = start_index + f'+{match.start()}c'
             cleaned_end_idx = cleaned_start_idx + f'+{len(cleaned_text)}c'
 
-            # Tag the cleaned text
             self.open_aspect_window(cleaned_start_idx, cleaned_end_idx, cleaned_text)
 
     def open_aspect_window(self, start_index, end_index, word):
