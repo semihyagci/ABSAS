@@ -30,6 +30,8 @@ class AdditionalAspectTaggingApp(tk.Frame):
 
         self.text.bind("<MouseWheel>", self.on_text_scroll)
 
+        self.text.config(state=tk.DISABLED)
+
     def tag_word(self, start_index, end_index):
         selected_text = self.text.get(start_index, end_index)
 
