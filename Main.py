@@ -2,14 +2,15 @@ import csv
 import sys
 import tkinter as tk
 from tkinter import filedialog
-from pyabsa import ATEPCCheckpointManager
 from Template import Template
 import ast
+from pyabsa import ATEPCCheckpointManager
 from global_dict_list import global_dict_list
 from afinn import Afinn
 from sentence_splitter import SentenceSplitter
 
 global_filename = ""
+aspect_extractor = ATEPCCheckpointManager.get_aspect_extractor(checkpoint='english', auto_device=True)
 
 
 def analyze_sentiment(sentence):
@@ -24,7 +25,7 @@ def analyze_sentiment(sentence):
     return sentiment
 
 
-def extract_aspects(sentence, aspect_extractor):
+def extract_aspects(sentence):
     result = aspect_extractor.extract_aspect(inference_source=[sentence], pred_sentiment=True)
 
     aspects = result[0]['aspect']
@@ -213,7 +214,6 @@ def confirm_choice(choice, sentences):
 
         root.bind("<MouseWheel>", lambda event: scroll_canvas(event, canvas))
     else:
-
         for widget in root.winfo_children():
             widget.destroy()
         root.geometry("1200x700")
@@ -254,7 +254,6 @@ def confirm_choice(choice, sentences):
                 template = Template(frame, id_num=i + 1, text_list=mylist[i]['sentence'], dct=mylist[i])
                 template.grid(row=i + 1, column=0, columnspan=3, padx=5, pady=(30, bottom_padding), sticky="ew")
         else:
-            aspect_extractor = ATEPCCheckpointManager.get_aspect_extractor(checkpoint='english', auto_device=True)
             for idx, input_text in enumerate(sentences):
                 if idx == len(sentences) - 1:
                     bottom_padding = 60
@@ -264,7 +263,7 @@ def confirm_choice(choice, sentences):
                 dct = {
                     "sentenceID": idx + 1,
                     "sentence": input_text,
-                    "list": extract_aspects(input_text, aspect_extractor),
+                    "list": extract_aspects(input_text),
                     "overall": "Neutral",
                     "additional_aspect_list": [],
                     "sentence_afinn_score": analyze_sentiment(input_text)
@@ -284,9 +283,6 @@ def scroll_canvas(event, canvas):
 
 
 def save_data():
-    root = tk.Tk()
-    root.withdraw()
-
     file_path = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
     if not file_path:
         print("Save cancelled.")
