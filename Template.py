@@ -21,11 +21,11 @@ class Template(tk.Frame):
             Template.column_names_created = True
         # ID Label
         id_label = tk.Label(self, text=f"ID: {self.id_num}")
-        id_label.grid(row=1, column=0, padx=5, pady=5, sticky="w")
+        id_label.grid(row=1, column=0, padx=5, pady=30, sticky="w")
 
         # Aspect Tagging Widget
         aspect_tagging_app = AspectTaggingApp(self, self.text_list, self.dct, self.id_num)
-        aspect_tagging_app.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
+        aspect_tagging_app.grid(row=1, column=1, padx=5, pady=30, sticky="ew")
 
         # Overall Sentiment Dropdown
         options = ["Positive", "Negative", "Neutral"]
@@ -33,15 +33,15 @@ class Template(tk.Frame):
         overall_value = self.dct.get('overall', 'Neutral')  # Get the value of 'overall', default to 'Neutral'
         self.sentiment_var.set(overall_value)  # Set the initial value of the dropdown
         dropdown = tk.OptionMenu(self, self.sentiment_var, *options)
-        dropdown.grid(row=1, column=2, padx=5, pady=5, sticky="ew")
+        dropdown.grid(row=1, column=2, padx=20, pady=30, sticky="ew")
 
         # Afinn Score Label
         afinn_label = tk.Label(self, text=f"{self.dct['sentence_afinn_score']}")
-        afinn_label.grid(row=1, column=3, padx=5, pady=5, sticky="ew")
+        afinn_label.grid(row=1, column=3, padx=40, pady=30, sticky="ew")
 
         # ADDITIONAL ASPECT PART
         add_button = tk.Button(self, text="Add Additional Aspect", command=self.open_additional_aspect_dialog)
-        add_button.grid(row=1, column=4, padx=5, pady=5, sticky="ew")
+        add_button.grid(row=1, column=4, padx=40, pady=30, sticky="ew")
 
     def open_additional_aspect_dialog(self):
         # Create a Toplevel window for the additional aspect dialog
@@ -87,10 +87,15 @@ class Template(tk.Frame):
 
         # Create labels for column names
         column_names = ["ID", "Text", "Overall Sentiment", "Afinn Score", "Additional Aspect"]
-        for col_name in column_names:
+        for i, col_name in enumerate(column_names):
             label = tk.Label(column_frame, text=col_name, bg="#CCCCCC", padx=10, pady=5, font=("Arial", 14, "bold"))
-            # label.place_configure(x=10,y=10)
-            label.pack(side="left")
+            if i == 1:  # Add spacer label between 0 and 1 index columns
+                spacer_label = tk.Label(column_frame, text="", bg="#CCCCCC", padx=125, pady=5)
+                spacer_label.grid(row=0, column=(i * 2) - 1)  # Adjust column index for spacer label
+            elif i == 2:  # Add spacer label between 1 and 2 index columns
+                spacer_label = tk.Label(column_frame, text="", bg="#CCCCCC", padx=125, pady=5)
+                spacer_label.grid(row=0, column=(i * 2) - 1)  # Adjust column index for spacer label
+            label.grid(row=0, column=i * 2)  # Adjust column index for column label
 
         # Place the column frame at the top of the window
         column_frame.place(relx=0.5, rely=0, anchor="n", relwidth=1.0)
