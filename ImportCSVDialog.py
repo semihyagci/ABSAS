@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import filedialog
 import csv
 
-
 class ImportCSVDialog(tk.Toplevel):
     def __init__(self, master):
         super().__init__(master)
@@ -47,18 +46,14 @@ class TaggingDialog(tk.Toplevel):
 
         self.file_path = file_path
 
-        self.csv_content = self.read_csv_file()
+        self.csv_content = self.read_csv()
 
-    def read_csv_file(self):
-        csv_content = []
-        try:
-            with open(self.file_path, newline='', encoding='utf-8') as csvfile:
-                csv_reader = csv.reader(csvfile)
-                next(csv_reader)  # Skip the first row
-                for row in csv_reader:
-                    csv_content.append(row)
-        except Exception as e:
-            print(f"Error reading CSV file: {e}")
-
-        print(csv_content)
-        return csv_content
+    def read_csv(self):
+        additional_options = []
+        with open(self.file_path, 'r') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                if 'Additional' in row:
+                    additional_options.append(row['Additional'])
+        print(additional_options)
+        return additional_options
