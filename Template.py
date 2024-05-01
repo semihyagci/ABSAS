@@ -21,11 +21,11 @@ class Template(tk.Frame):
             Template.column_names_created = True
         # ID Label
         id_label = tk.Label(self, text=f"ID: {self.id_num}")
-        id_label.grid(row=1, column=0, padx=5, pady=5)
+        id_label.grid(row=1, column=0, padx=5, pady=5, sticky="w")
 
         # Aspect Tagging Widget
         aspect_tagging_app = AspectTaggingApp(self, self.text_list, self.dct, self.id_num)
-        aspect_tagging_app.grid(row=1, column=1, padx=5, pady=5)
+        aspect_tagging_app.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
 
         # Overall Sentiment Dropdown
         options = ["Positive", "Negative", "Neutral"]
@@ -33,15 +33,15 @@ class Template(tk.Frame):
         overall_value = self.dct.get('overall', 'Neutral')  # Get the value of 'overall', default to 'Neutral'
         self.sentiment_var.set(overall_value)  # Set the initial value of the dropdown
         dropdown = tk.OptionMenu(self, self.sentiment_var, *options)
-        dropdown.grid(row=1, column=2, padx=5, pady=5)
+        dropdown.grid(row=1, column=2, padx=5, pady=5, sticky="ew")
 
         # Afinn Score Label
         afinn_label = tk.Label(self, text=f"{self.dct['sentence_afinn_score']}")
-        afinn_label.grid(row=1, column=3, padx=5, pady=5)
+        afinn_label.grid(row=1, column=3, padx=5, pady=5, sticky="ew")
 
         # ADDITIONAL ASPECT PART
         add_button = tk.Button(self, text="Add Additional Aspect", command=self.open_additional_aspect_dialog)
-        add_button.grid(row=1, column=4, padx=5, pady=5)
+        add_button.grid(row=1, column=4, padx=5, pady=5, sticky="ew")
 
     def open_additional_aspect_dialog(self):
         # Create a Toplevel window for the additional aspect dialog
@@ -82,24 +82,18 @@ class Template(tk.Frame):
 
     def create_column_names(self):
         # ID column
-        id_label = tk.Label(self, text="ID")
-        id_label.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+        column_frame = tk.Frame(self.master.master.master, bg="#CCCCCC")
+        column_frame.pack(side="top", fill="x", padx=10, pady=(20, 5))  # Added vertical padding
 
-        # Aspect Tagging column
-        aspect_label = tk.Label(self, text="Text")
-        aspect_label.grid(row=0, column=1, columnspan=1, padx=5, pady=1, sticky="n")
+        # Create labels for column names
+        column_names = ["ID", "Text", "Overall Sentiment", "Afinn Score", "Additional Aspect"]
+        for col_name in column_names:
+            label = tk.Label(column_frame, text=col_name, bg="#CCCCCC", padx=10, pady=5, font=("Arial", 14, "bold"))
+            # label.place_configure(x=10,y=10)
+            label.pack(side="left")
 
-        # Overall Sentiment column
-        overall_label = tk.Label(self, text="Overall Sentiment")
-        overall_label.grid(row=0, column=2, padx=5, pady=5, sticky="n")
-
-        # Afinn Sentiment Score column
-        afinn_label = tk.Label(self, text="Afinn Sentiment Score")
-        afinn_label.grid(row=0, column=3, padx=5, pady=5, sticky="n")
-
-        # Additional Aspect column
-        add_label = tk.Label(self, text="Additional Aspect")
-        add_label.grid(row=0, column=4, padx=5, pady=5, sticky="n")
+        # Place the column frame at the top of the window
+        column_frame.place(relx=0.5, rely=0, anchor="n", relwidth=1.0)
 
     def update_overall_sentiment_dropdown(self, aspect):
         self.sentiment_var.set(aspect)
