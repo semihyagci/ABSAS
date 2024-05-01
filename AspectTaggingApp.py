@@ -1,3 +1,4 @@
+import sys
 import tkinter as tk
 from tkinter import ttk
 
@@ -21,8 +22,13 @@ class AspectTaggingApp(tk.Frame):
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.text.config(yscrollcommand=scrollbar.set)
 
-        # Bind right-click event for multiple word tagging
-        self.text.bind("<Button-3>", self.on_right_click)
+
+        if sys.platform.startswith('darwin'):  # MacOS
+            self.text.bind("<Button-2>", self.on_right_click)
+        elif sys.platform.startswith('win'):  # Windows
+            self.text.bind("<Button-3>", self.on_right_click)
+
+        # Bind mouse wheel scroll event
         self.text.bind("<MouseWheel>", self.on_text_scroll)
 
         # Pre-populate the text and apply aspects
@@ -67,7 +73,7 @@ class AspectTaggingApp(tk.Frame):
         # Stop the event propagation to prevent scrolling the outer window
         return "break"
 
-    def on_right_click(self, event):
+    def on_right_click(self):
         start_index = self.text.index("sel.first")
         end_index = self.text.index("sel.last")
         if start_index and end_index:

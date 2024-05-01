@@ -1,6 +1,4 @@
 import tkinter as tk
-from tkinter import ttk
-
 
 class AdditionalAspectTaggingApp(tk.Frame):
     def __init__(self, master, sentence, dct, id_num, *args, **kwargs):
@@ -23,21 +21,22 @@ class AdditionalAspectTaggingApp(tk.Frame):
         self.text.insert(tk.END, self.sentence + "\n\n")
         self.text.config(yscrollcommand=scrollbar.set)
 
-        self.text.bind("<Double-Button-1>", self.tag_word)
+        self.text.bind("<Button-3>", self.on_right_click)
         self.text.bind("<MouseWheel>", self.on_text_scroll)
 
-    def tag_word(self, event):
-        index = self.text.index(f"@{event.x},{event.y}")
-        word_start = self.text.index(f"{index} wordstart")
-        word_end = self.text.index(f"{index} wordend")
-        word = self.text.get(word_start, word_end)
+    def tag_word(self, start_index, end_index):
+        word = self.text.get(start_index, end_index)
         if len(word) != 1:
-            self.master.master.assign_selected_row(word,word_start,word_end)
+            self.master.master.assign_selected_row(word, start_index, end_index)
+
+    def on_right_click(self, event):
+        index = self.text.index(f"@{event.x},{event.y}")
+        start_index = self.text.index("sel.first")
+        end_index = self.text.index("sel.last")
+        if start_index and end_index:
+            self.tag_word(start_index, end_index)
 
     def on_text_scroll(self, event):
-        # Determine the direction of scrolling
         scroll_direction = -1 if event.delta > 0 else 1
-        # Scroll the text widget
         self.text.yview_scroll(scroll_direction, "units")
-        # Stop the event propagation to prevent scrolling the outer window
         return "break"

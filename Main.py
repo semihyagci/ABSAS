@@ -2,7 +2,6 @@ import csv
 import sys
 import tkinter as tk
 from tkinter import filedialog
-import nltk
 from Template import Template
 import ast
 from global_dict_list import global_dict_list
