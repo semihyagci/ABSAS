@@ -1,4 +1,5 @@
 import tkinter as tk
+import sys
 
 class AdditionalAspectTaggingApp(tk.Frame):
     def __init__(self, master, sentence, dct, id_num, *args, **kwargs):
@@ -21,7 +22,11 @@ class AdditionalAspectTaggingApp(tk.Frame):
         self.text.insert(tk.END, self.sentence + "\n\n")
         self.text.config(yscrollcommand=scrollbar.set)
 
-        self.text.bind("<Button-3>", self.on_right_click)
+        if sys.platform.startswith('darwin'):  # MacOS
+            self.text.bind("<Button-2>", self.on_right_click)
+        elif sys.platform.startswith('win'):  # Windows
+            self.text.bind("<Button-3>", self.on_right_click)
+
         self.text.bind("<MouseWheel>", self.on_text_scroll)
 
     def tag_word(self, start_index, end_index):

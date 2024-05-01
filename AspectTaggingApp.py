@@ -73,7 +73,7 @@ class AspectTaggingApp(tk.Frame):
         # Stop the event propagation to prevent scrolling the outer window
         return "break"
 
-    def on_right_click(self):
+    def on_right_click(self,event):
         start_index = self.text.index("sel.first")
         end_index = self.text.index("sel.last")
         if start_index and end_index:
