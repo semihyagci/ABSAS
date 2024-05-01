@@ -72,10 +72,10 @@ class AdditionalAspectTemplate(tk.Frame):
         add_button.grid(row=0, column=3, padx=5, pady=5)
 
         import_csv_button = tk.Button(third_frame, text="Import from CSV", command=self.import_from_csv)
-        import_csv_button.grid(row=0, column=4, padx=5, pady=5)
+        import_csv_button.grid(row=1, column=1,columnspan=4, padx=5, pady=5)
 
         save_button = tk.Button(third_frame, text="Save", command=self.save_additional)
-        save_button.grid(row=1, column=0, columnspan=4, padx=5, pady=5)
+        save_button.grid(row=1, column=0, columnspan=2, padx=5, pady=5)
 
 
     def add_row(self, matrix_frame):

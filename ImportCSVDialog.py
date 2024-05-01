@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog
 import csv
 
+
 class ImportCSVDialog(tk.Toplevel):
     def __init__(self, master):
         super().__init__(master)
@@ -26,6 +27,7 @@ class ImportCSVDialog(tk.Toplevel):
             tagging_dialog.grab_set()
             tagging_dialog.focus_set()
 
+
 class TaggingDialog(tk.Toplevel):
     def __init__(self, master, file_path):
         super().__init__(master)
@@ -33,3 +35,21 @@ class TaggingDialog(tk.Toplevel):
         self.geometry("400x200")
 
         self.file_path = file_path
+
+        # Read CSV file and extract values from 'Additional' column
+        self.additional_options = self.read_csv()
+
+        # Dropdown menu to display options from 'Additional' column
+        self.selected_option = tk.StringVar(self)
+        self.selected_option.set("")  # Default value
+        dropdown_menu = tk.OptionMenu(self, self.selected_option, *self.additional_options)
+        dropdown_menu.pack(pady=10)
+
+    def read_csv(self):
+        additional_options = []
+        with open(self.file_path, 'r') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                if 'Additional' in row:
+                    additional_options.append(row['Additional'])
+        return additional_options
