@@ -9,6 +9,7 @@ class Template(tk.Frame):
 
     def __init__(self, master, id_num, text_list, dct, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
+        self.master.master.master.title("ABSAS")
         self.id_num = id_num
         self.text_list = text_list
         self.dct = dct
