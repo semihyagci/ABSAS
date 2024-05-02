@@ -114,8 +114,44 @@ class AdditionalAspectTemplate(tk.Frame):
         tk.Label(matrix_frame, text=str(new_id)).grid(row=current_row_count, column=0, padx=5, pady=5)
         tk.Label(matrix_frame, text=aspect_name).grid(row=current_row_count, column=1, padx=5, pady=5)
         tk.Label(matrix_frame, text=matched_word).grid(row=current_row_count, column=2, padx=5, pady=5)
+
+        # Create delete button for this row
+        delete_button = tk.Button(matrix_frame, text="Delete Row",
+                                  command=lambda index=current_row_count: self.delete_row(index))
+        delete_button.grid(row=current_row_count, column=4, padx=5, pady=5)
+
         new_tuple = (self.unique, aspect_name, matched_word, aspect_type_var)
         self.add_list.append(new_tuple)
+
+    def delete_row(self, index):
+        del self.add_list[index - 1]  # Adjusting index to match list index (starts from 0)
+        self.update_matrix_frame()
+
+    def update_matrix_frame(self):
+        # Clear the matrix frame
+        for widget in self.matrix_frame.winfo_children():
+            widget.grid_forget()
+
+        # Rebuild matrix frame with updated content from self.add_list
+        headers = ["ID", "Aspect Name", "Matched Word", "Aspect Type", ""]
+        for i, header in enumerate(headers):
+            tk.Label(self.matrix_frame, text=header).grid(row=0, column=i, padx=5, pady=5)
+
+        for idx, aspect_tuple in enumerate(self.add_list, start=1):
+            indices, aspect_name, word, aspect_type_var = aspect_tuple
+            start_index, end_index = map(str, indices.split(':'))
+            start = f"1.{start_index}"
+            end = f"1.{end_index}"
+            tk.Label(self.matrix_frame, text=str(idx)).grid(row=idx, column=0, padx=5, pady=5)
+            tk.Label(self.matrix_frame, text=aspect_name).grid(row=idx, column=1, padx=5, pady=5)
+            tk.Label(self.matrix_frame, text=word).grid(row=idx, column=2, padx=5, pady=5)
+
+            aspect_type_menu = tk.OptionMenu(self.matrix_frame, aspect_type_var, "Neutral", "Positive", "Negative")
+            aspect_type_menu.grid(row=idx, column=3, padx=5, pady=5)
+
+            # Create delete button for each row
+            delete_button = tk.Button(self.matrix_frame, text="Delete Row", command=lambda i=idx: self.delete_row(i))
+            delete_button.grid(row=idx, column=4, padx=5, pady=5)
 
     def assign_selected_row(self, word, word_start, word_end):
         self.text = word
