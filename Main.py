@@ -12,6 +12,7 @@ from sentence_splitter import SentenceSplitter
 
 warnings.filterwarnings("ignore")
 global_filename = ""
+selected_keys = {}
 
 aspect_extractor = ATEPCCheckpointManager.get_aspect_extractor(checkpoint='english', auto_device=True)
 
@@ -71,11 +72,23 @@ def load_dataset():
             with open(file_path, 'r') as file:
                 dataset = file.read()
         elif file_path.endswith('.csv'):
-            with open(file_path, 'r') as csvfile:
-                reader = csv.DictReader(csvfile)
-                dataset = ''
-                for row in reader:
-                    dataset += row['sentence'] + '\n'  # Concatenate sentences from CSV
+            try:
+                with open(file_path, 'r') as csvfile:
+                    reader = csv.DictReader(csvfile)
+                    fieldnames = reader.fieldnames
+                    required_fields = ['sentenceID', 'sentence', 'list', 'overall', 'additional_aspect_list',
+                                       'sentence_afinn_score']
+                    if not all(field in fieldnames for field in required_fields):
+                        print("CSV file format is incorrect.")
+                        tk.messagebox.showerror("Error", "CSV file format is incorrect. Missing required fields.")
+                        return
+                    dataset = ''
+                    for row in reader:
+                        dataset += row['sentence'] + '\n'  # Concatenate sentences from CSV
+            except csv.Error as e:
+                print(f"Error reading CSV file: {e}")
+                tk.messagebox.showerror("Error", f"Error reading CSV file: {e}")
+                return
         else:
             print("Unsupported file format.")
             return
@@ -182,7 +195,7 @@ def confirm_choice(choice, sentences):
         save_frame = tk.Frame(root, bg="#CCCCCC")
         save_frame.pack(side="bottom", fill="x", padx=10, pady=5)
 
-        save_button = tk.Button(save_frame, text="Save", command=save_data)
+        save_button = tk.Button(save_frame, text="Save", command=show_checkbox_window)
         save_button.pack(pady=5, ipadx=20, ipady=10)
 
         save_frame.place(relx=0.5, rely=1.0, anchor="s", relwidth=1.0)
@@ -242,7 +255,7 @@ def confirm_choice(choice, sentences):
         save_frame = tk.Frame(root, bg="#CCCCCC")
         save_frame.pack(side="bottom", fill="x", padx=10, pady=5)
 
-        save_button = tk.Button(save_frame, text="Save", command=save_data)
+        save_button = tk.Button(save_frame, text="Save", command=show_checkbox_window)
         save_button.pack(pady=5, ipadx=20, ipady=10)
 
         save_frame.place(relx=0.5, rely=1.0, anchor="s", relwidth=1.0)
@@ -298,14 +311,71 @@ def save_data():
         print("Save cancelled.")
         return
 
-    with open(file_path, 'w', newline='') as csvfile:
-        fieldnames = ['sentenceID', 'sentence', 'list', 'overall', 'additional_aspect_list', 'sentence_afinn_score']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    if file_path.endswith('.csv'):
+        file_path = file_path[:-4]
 
-        writer.writeheader()
-        for item in global_dict_list:
-            writer.writerow(item)
+    if len(selected_keys) == 1 and selected_keys.get('sentenceID').get():
+        # Only 'sentenceID' checkbox is selected, no need to save filtered data
+        with open(file_path + '_all_data.csv', 'w', newline='') as all_data_csvfile:
+            all_data_fieldnames = ['sentenceID', 'sentence', 'list', 'overall', 'additional_aspect_list',
+                                   'sentence_afinn_score']
+            all_data_writer = csv.DictWriter(all_data_csvfile, fieldnames=all_data_fieldnames)
+            all_data_writer.writeheader()
+            for item in global_dict_list:
+                all_data_writer.writerow(item)
+    else:
+        # Save both entire dictionary and filtered data
+        with open(file_path + '_all_data.csv', 'w', newline='') as all_data_csvfile:
+            all_data_fieldnames = ['sentenceID', 'sentence', 'list', 'overall', 'additional_aspect_list',
+                                   'sentence_afinn_score']
+            all_data_writer = csv.DictWriter(all_data_csvfile, fieldnames=all_data_fieldnames)
+            all_data_writer.writeheader()
+            for item in global_dict_list:
+                all_data_writer.writerow(item)
+
+        fieldnames = [key for key, var in selected_keys.items() if var.get()]
+        if fieldnames:
+            # Save filtered data based on selected checkboxes
+            with open(file_path + '_filtered_data.csv', 'w', newline='') as filtered_data_csvfile:
+                filtered_data_writer = csv.DictWriter(filtered_data_csvfile, fieldnames=fieldnames)
+                filtered_data_writer.writeheader()
+
+                for item in global_dict_list:
+                    # Filter the item based on selected keys
+                    filtered_item = {key: item[key] for key in fieldnames if key in item}
+                    filtered_data_writer.writerow(filtered_item)
+
     sys.exit()
+
+
+def show_checkbox_window():
+    # Ask the user if they want to save the data with specific filters
+    response = tk.messagebox.askyesno("Save with Filters", "Do you want to save the data with specific filters?")
+
+    if response:  # If the user wants to save with filters, show the checkbox window
+        display_filtered_checkbox_window()
+    else:  # Otherwise, proceed to save the entire dictionary without filtering
+        save_data()
+
+
+def display_filtered_checkbox_window():
+    global selected_keys
+    checkbox_window = tk.Toplevel()
+    checkbox_window.title("Select Keys to Save")
+    checkbox_window.geometry("300x200")
+    checkbox_window.resizable(False, False)
+
+    selected_keys = {'sentenceID': tk.BooleanVar(value=True)}  # Add sentenceID by default
+
+    for key in global_dict_list[0].keys():
+        if key != 'sentenceID':  # Exclude sentenceID from being selectable
+            var = tk.BooleanVar()
+            checkbox = tk.Checkbutton(checkbox_window, text=key, variable=var, onvalue=True, offvalue=False)
+            checkbox.pack(anchor='w')
+            selected_keys[key] = var  # Store the BooleanVar object along with the key
+
+    save_checkbox_button = tk.Button(checkbox_window, text="Save Checkboxes", command=save_data)
+    save_checkbox_button.pack(side="bottom", pady=5, ipadx=20, ipady=10)
 
 
 def create_scrollable_text(parent):
