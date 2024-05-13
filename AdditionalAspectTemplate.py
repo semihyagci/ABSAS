@@ -55,7 +55,9 @@ class AdditionalAspectTemplate(tk.Frame):
                 aspect_type_menu.grid(row=idx, column=3, padx=5, pady=5)
 
                 self.add_list.append((indices, aspect_name, word, aspect_type_var))
-
+                delete_button = tk.Button(self.matrix_frame, text="Delete Row",
+                                          command=lambda index=idx: self.delete_row(index))
+                delete_button.grid(row=idx, column=4, padx=5, pady=5)
         third_frame = tk.Frame(self)
         third_frame.grid(row=2, column=0, padx=5, pady=5, sticky="ew")
         tk.Label(third_frame, text="Enter Aspect Name:").grid(row=0, column=0, padx=5, pady=5)
@@ -152,7 +154,6 @@ class AdditionalAspectTemplate(tk.Frame):
             # Create delete button for each row
             delete_button = tk.Button(self.matrix_frame, text="Delete Row", command=lambda i=idx: self.delete_row(i))
             delete_button.grid(row=idx, column=4, padx=5, pady=5)
-
     def assign_selected_row(self, word, word_start, word_end):
         self.text = word
         self.selected_text_label.config(text=f"Selected text: {self.text}")
@@ -176,7 +177,7 @@ class AdditionalAspectTemplate(tk.Frame):
         updated_list = []
 
         if 'additional_aspect_list' in self.dct and self.dct['additional_aspect_list'] is not None:
-            updated_list = self.dct['additional_aspect_list']
+            updated_list = self.add_list
 
         for aspect_tuple in self.add_list:
             unique_id, aspect_name, matched_word, aspect_type_var = aspect_tuple
@@ -197,5 +198,9 @@ class AdditionalAspectTemplate(tk.Frame):
                 updated_list.append((unique_id, aspect_name, matched_word, aspect_type))
 
         self.dct['additional_aspect_list'] = updated_list
+
+        # Print or use the updated dictionary as needed
         print("Updated additional aspect list:", self.dct['additional_aspect_list'])
+
+        # Close the window
         self.master.master.master.destroy()
