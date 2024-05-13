@@ -273,6 +273,11 @@ def confirm_choice(choice, sentences):
                     bottom_padding = 5
 
                 global_dict_list.append(mylist[i])
+                prev_list = mylist[i]['list']
+                mylist[i]['list'] = extract_aspects(mylist[i]['sentence'])
+                for item in prev_list:
+                    if not mylist[i]['list'][0][1].__contains__(item[1]):
+                        mylist[i]['list'].append(item)
                 template = Template(frame, id_num=i + 1, text_list=mylist[i]['sentence'], dct=mylist[i])
                 template.grid(row=i + 1, column=0, columnspan=3, padx=5, pady=(30, bottom_padding), sticky="ew")
         else:
