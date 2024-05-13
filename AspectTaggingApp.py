@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 import re
 
+
 class AspectTaggingApp(tk.Frame):
     def __init__(self, master, sentence, dct, id_num, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
@@ -23,7 +24,6 @@ class AspectTaggingApp(tk.Frame):
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.text.config(yscrollcommand=scrollbar.set)
 
-
         if sys.platform.startswith('darwin'):  # MacOS
             self.text.bind("<Button-2>", self.on_right_click)
         elif sys.platform.startswith('win'):  # Windows
@@ -34,21 +34,6 @@ class AspectTaggingApp(tk.Frame):
 
         # Pre-populate the text and apply aspects
         self.prepopulate_text_with_aspects()
-
-    def calculate_overall_sentiment(self):
-        # Count occurrences of each aspect along with their words
-        sentiment_counts = {'Positive': [], 'Neutral': [], 'Negative': []}
-        for unique_id, word, aspect in self.dct['list']:
-            sentiment_counts[aspect].append((unique_id, word))
-
-        # Determine the overall aspect based on counts
-        overall_sentiment = 'Neutral'  # Default overall aspect
-        if len(sentiment_counts['Positive']) > len(sentiment_counts['Negative']):
-            overall_sentiment = 'Positive'
-        elif len(sentiment_counts['Negative']) > len(sentiment_counts['Positive']):
-            overall_sentiment = 'Negative'
-
-        return overall_sentiment
 
     def prepopulate_text_with_aspects(self):
         self.text.insert(tk.END, self.sentence + "\n\n")
@@ -74,7 +59,7 @@ class AspectTaggingApp(tk.Frame):
         # Stop the event propagation to prevent scrolling the outer window
         return "break"
 
-    def on_right_click(self,event):
+    def on_right_click(self, event):
         start_index = self.text.index("sel.first")
         end_index = self.text.index("sel.last")
         if start_index and end_index:
@@ -111,12 +96,6 @@ class AspectTaggingApp(tk.Frame):
                                                                        aspect_window))
         confirm_button.pack(pady=5)
 
-    def update_overall_sentiment(self):
-        overall_sentiment = self.calculate_overall_sentiment()
-        self.dct['overall'] = overall_sentiment
-        #CALLBACK FUNCTION FOR OVERALL SENTIMENT VALUE
-        self.master.update_overall_sentiment_dropdown(overall_sentiment)
-
     def confirm_aspect(self, word_start, word_end, aspect, aspect_window):
         # Define aspect colors
         color = {"Positive": "green", "Negative": "red", "Neutral": "gray"}
@@ -141,14 +120,11 @@ class AspectTaggingApp(tk.Frame):
         for entry in self.dct["list"]:
             if entry[0] == unique_id:  # Check if the unique ID is already in the list
                 entry[1] = word  # Update the word itself
-                entry[2] = aspect # Update the aspect
+                entry[2] = aspect  # Update the aspect
                 updated = True
                 break
         if not updated:
             self.dct["list"].append((unique_id, word, aspect))  # Append the tuple
 
-        self.update_overall_sentiment()
 
         aspect_window.destroy()
-
-

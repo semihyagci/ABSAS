@@ -32,9 +32,8 @@ class Template(tk.Frame):
         self.sentiment_var = tk.StringVar(self)
         overall_value = self.dct.get('overall', 'Neutral')  # Get the value of 'overall', default to 'Neutral'
         self.sentiment_var.set(overall_value)  # Set the initial value of the dropdown
-        dropdown = tk.OptionMenu(self, self.sentiment_var, *options)
+        dropdown = tk.OptionMenu(self, self.sentiment_var, *options, command=self.update_sentiment_var)
         dropdown.grid(row=1, column=2, padx=20, pady=30, sticky="ew")
-
         # Afinn Score Label
         afinn_label = tk.Label(self, text=f"{self.dct['sentence_afinn_score']}")
         afinn_label.grid(row=1, column=3, padx=40, pady=30, sticky="ew")
@@ -74,6 +73,10 @@ class Template(tk.Frame):
         content_template = AdditionalAspectTemplate(frame, self.id_num, self.text_list, self.dct)
         content_template.pack(anchor="w", padx=5, pady=5)
 
+    def update_sentiment_var(self, selected_value):
+        self.sentiment_var.set(selected_value)
+        self.dct['overall'] = self.sentiment_var.get()
+
     def scroll_canvas_here(self, event, canvas):
         if event.delta > 0:
             canvas.yview_scroll(-1, "units")
@@ -97,5 +100,3 @@ class Template(tk.Frame):
 
         column_frame.place(relx=0.5, rely=0, anchor="n", relwidth=1.0)
 
-    def update_overall_sentiment_dropdown(self, aspect):
-        self.sentiment_var.set(aspect)
