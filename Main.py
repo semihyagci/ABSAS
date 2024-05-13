@@ -54,7 +54,6 @@ def extract_aspects(sentence):
 
     return word_indices_sentiment_sentence
 
-
 def import_file():
     global global_filename
     file_path = filedialog.askopenfilename(filetypes=[("Text files", "*.txt"), ("CSV files", "*.csv")])
@@ -365,14 +364,22 @@ def display_filtered_checkbox_window():
     checkbox_window.geometry("300x200")
     checkbox_window.resizable(False, False)
 
-    selected_keys = {'sentenceID': tk.BooleanVar(value=True)}  # Add sentenceID by default
+    selected_keys = {'sentenceID': tk.BooleanVar(value=True)}  # Initialize an empty dictionary to store selected keys
 
     for key in global_dict_list[0].keys():
-        if key != 'sentenceID':  # Exclude sentenceID from being selectable
+        if key != 'sentenceID':
             var = tk.BooleanVar()
-            checkbox = tk.Checkbutton(checkbox_window, text=key, variable=var, onvalue=True, offvalue=False)
+            custom_names = {
+                'sentence': 'Sentence',
+                'list': 'Aspect List',
+                'overall': 'Overall Score',
+                'additional_aspect_list': 'Additional Aspects',
+                'sentence_afinn_score': 'Afinn Score'
+            }
+            checkbox_text = custom_names.get(key, key)
+            checkbox = tk.Checkbutton(checkbox_window, text=checkbox_text, variable=var, onvalue=True, offvalue=False)
             checkbox.pack(anchor='w')
-            selected_keys[key] = var  # Store the BooleanVar object along with the key
+            selected_keys[key] = var
 
     save_checkbox_button = tk.Button(checkbox_window, text="Save Checkboxes", command=save_data)
     save_checkbox_button.pack(side="bottom", pady=5, ipadx=20, ipady=10)
